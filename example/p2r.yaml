@@ -1,0 +1,17 @@
+---
+sync_steps:
+  - cmd:
+      base: rsync
+      args: ["-av", "--delete", "--exclude=acme"]
+      debug_arg: "-n"
+    local:
+      folder: ${BASEDIR}/
+    remote:
+      host: remote_machine
+      folder: /etc/whatever
+      user: marty
+      group: mcfly
+
+tunnel:
+  local_port: 3333
+  remote_port: 80
