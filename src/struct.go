@@ -1,11 +1,13 @@
 package main
 
 type tConfig struct {
-	SyncSteps []tSyncSteps `yaml:"sync_steps"`
-	Tunnel    tTunnel      `yaml:"tunnel"`
+	SyncSteps tSyncSteps `yaml:"sync_steps"`
+	Tunnel    tTunnel    `yaml:"tunnel"`
 }
 
-type tSyncSteps struct {
+type tSyncSteps []tSyncStep
+
+type tSyncStep struct {
 	Cmd    tCmd    `yaml:"cmd"`
 	Local  tLocal  `yaml:"local"`
 	Remote tRemote `yaml:"remote"`

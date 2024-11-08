@@ -17,7 +17,7 @@ var (
 	appMainversion = "0.1"
 )
 
-var CLI struct {
+var cli struct {
 	Cmd         string `help:"command to run, can be: [${enum}]" arg:"" enum:"info,push,pull,tun" default:"info"`
 	Config      string `help:"config file" default:"${configFile}" short:"f"`
 	Print       bool   `help:"only print commands that would have been executed" short:"p"`
@@ -31,7 +31,7 @@ var CLI struct {
 
 func parseArgs() {
 	curdir := pwd()
-	_ = kong.Parse(&CLI,
+	_ = kong.Parse(&cli,
 		kong.Name(appName),
 		kong.Description(appDescription),
 		kong.UsageOnError(),
@@ -48,7 +48,7 @@ func parseArgs() {
 	// err := ctx.Run()
 	// ctx.FatalIfErrorf(err)
 
-	if CLI.VersionFlag {
+	if cli.VersionFlag {
 		printBuildTags(BUILDTAGS)
 		os.Exit(0)
 	}
