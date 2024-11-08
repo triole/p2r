@@ -16,7 +16,7 @@ func main() {
 	lg.Info(
 		"start "+appName,
 		logseal.F{
-			"command":   cli.Cmd,
+			"command":   cli.Action,
 			"config":    cli.Config,
 			"dry-run":   cli.DryRun,
 			"log-level": cli.LogLevel,
@@ -24,7 +24,7 @@ func main() {
 	conf := readConfig(cli.Config)
 	lg.Debug("read config", logseal.F{"config": fmt.Sprintf("%+v", conf)})
 
-	switch cli.Cmd {
+	switch cli.Action {
 	case "tun":
 		fmt.Printf("%+v\n", "TUNNEL")
 	default:

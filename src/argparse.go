@@ -18,7 +18,7 @@ var (
 )
 
 var cli struct {
-	Cmd         string `help:"command to run, can be: [${enum}]" arg:"" enum:"info,push,pull,tun" default:"info"`
+	Action      string `help:"action to perform, can be: [${enum}]" arg:"" enum:"info,push,pull,tun" default:"info"`
 	Config      string `help:"config file" default:"${configFile}" short:"f"`
 	Print       bool   `help:"only print commands that would have been executed" short:"p"`
 	DryRun      bool   `help:"execute sync dry run syncs" short:"n"`

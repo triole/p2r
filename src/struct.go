@@ -26,8 +26,6 @@ type tLocal struct {
 type tRemote struct {
 	Host   string `yaml:"host"`
 	Folder string `yaml:"folder"`
-	User   string `yaml:"user"`
-	Group  string `yaml:"group"`
 }
 
 type tTunnel struct {

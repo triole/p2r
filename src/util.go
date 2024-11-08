@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
 
-func addTrailingSlash(s string) (r string) {
-	r = s
-	if strings.HasSuffix(s, "/") == false {
+func cleanPath(s string) (r string) {
+	r = path.Clean(s)
+	r = pabs(r)
+	if !strings.HasSuffix(r, "/") {
 		r += "/"
 	}
 	return

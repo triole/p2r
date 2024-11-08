@@ -2,15 +2,13 @@
 sync_steps:
   - cmd:
       base: rsync
-      args: ["-av", "--delete", "--exclude=acme"]
+      args: ["-av", "--delete", "--chown={{.user}}:admins", "--exclude=acme"]
       debug_arg: "-n"
     local:
-      folder: ${BASEDIR}/
+      folder: {{.workdir}}/conf
     remote:
       host: remote_machine
       folder: /etc/whatever
-      user: marty
-      group: mcfly
 
 tunnel:
   local_port: 3333
