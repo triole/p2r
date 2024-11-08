@@ -12,37 +12,41 @@ import (
 
 var (
 	BUILDTAGS      string
-	appName        = "bma"
-	appDescription = "backup machine"
+	appName        = "p2r"
+	appDescription = "push, pull or tun to remote file systems"
 	appMainversion = "0.1"
 )
 
 var CLI struct {
-	Cmd         string `help:"command to run" enum:"info,push,pull,tun" default:"info" arg:"" passthrough:""`
-	Config      string `help:"config file" optional:"" default:"${config}" short:"f"`
+	Cmd         string `help:"command to run, can be: [${enum}]" arg:"" enum:"info,push,pull,tun" default:"info"`
+	Config      string `help:"config file" default:"${configFile}" short:"f"`
 	Print       bool   `help:"only print commands that would have been executed" short:"p"`
 	DryRun      bool   `help:"execute sync dry run syncs" short:"n"`
 	LogFile     string `help:"log file" default:"/dev/stdout"`
-	LogLevel    string `help:"log level" default:"info" enum:"trace,debug,info,error"`
+	LogLevel    string `help:"log level, can be: [${enum}]" default:"info" enum:"trace,debug,info,error"`
 	LogNoColors bool   `help:"disable output colours, print plain text"`
 	LogJSON     bool   `help:"enable json log, instead of text one"`
 	VersionFlag bool   `help:"display version" short:"V"`
 }
 
 func parseArgs() {
-	ctx := kong.Parse(&CLI,
+	curdir := pwd()
+	_ = kong.Parse(&CLI,
 		kong.Name(appName),
 		kong.Description(appDescription),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{
-			Compact: true,
-			Summary: true,
+			Compact:      true,
+			Summary:      true,
+			NoAppSummary: true,
+			FlagsLast:    false,
 		}),
 		kong.Vars{
-			"config": filepath.Join(pwd(), "p2r.yaml"),
+			"configFile": filepath.Join(curdir, "p2r.yaml"),
 		},
 	)
-	_ = ctx.Run()
+	// err := ctx.Run()
+	// ctx.FatalIfErrorf(err)
 
 	if CLI.VersionFlag {
 		printBuildTags(BUILDTAGS)
