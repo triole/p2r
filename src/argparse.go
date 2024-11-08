@@ -18,10 +18,10 @@ var (
 )
 
 var cli struct {
-	Action      string `help:"action to perform, can be: [${enum}]" arg:"" enum:"info,push,pull,tun" default:"info"`
+	Action      string `help:"action to perform, can be: [${enum}]" arg:"" enum:"info,push,pull" default:"info"`
 	Config      string `help:"config file" default:"${configFile}" short:"f"`
-	Print       bool   `help:"only print commands that would have been executed" short:"p"`
-	DryRun      bool   `help:"execute sync dry run syncs" short:"n"`
+	DryRun      bool   `help:"only print commands what would have been executed" short:"n"`
+	RsyncDryRun bool   `help:"enable rsync dry runs" short:"m"`
 	LogFile     string `help:"log file" default:"/dev/stdout"`
 	LogLevel    string `help:"log level, can be: [${enum}]" default:"info" enum:"trace,debug,info,error"`
 	LogNoColors bool   `help:"disable output colours, print plain text"`

@@ -1,36 +1,66 @@
 package main
 
 import (
-	"strings"
+	"errors"
+	"fmt"
 
 	"github.com/triole/logseal"
 )
 
 func runSync(steps tSyncSteps) {
 	for _, step := range steps {
-		cmdBase, cmdArgs := assembleCommand(step)
-		_, _, err := runCmd(cmdBase, cmdArgs)
-		lg.IfErrFatal("sync failed", logseal.F{"error": err})
+		cmdArr, err := assembleCommand(step)
+		if len(err) == 0 {
+			_, _, err := runCmd(cmdArr)
+			lg.IfErrFatal("sync failed", logseal.F{"error": err})
+		} else {
+			for _, el := range err {
+				lg.Error(
+					"skip command", logseal.F{
+						"cmd": fmt.Sprintf("%+v", cmdArr), "error": el,
+					},
+				)
+			}
+		}
 	}
 }
 
-func assembleCommand(step tSyncStep) (cmdBase string, cmdArgs []string) {
-	cmdBase = step.Cmd.Base
-	if cli.DryRun {
-		cmdArgs = append(cmdArgs, step.Cmd.DebugArg)
+func assembleCommand(step tSyncStep) (cmdArr []string, errArr []error) {
+	var source, target string
+	cmdArr = step.Cmd
+	if cmdArr[0] == "rsync" && cli.RsyncDryRun {
+		cmdArr = append(cmdArr, "-n")
 	}
-	cmdArgs = append(cmdArgs, step.Cmd.Args...)
 	if cli.Action == "pull" {
-		cmdArgs = append(cmdArgs, makeRemotePath(step.Remote))
-		cmdArgs = append(cmdArgs, step.Local.Folder)
+		source = step.Remote
+		target = step.Local
 	}
 	if cli.Action == "push" {
-		cmdArgs = append(cmdArgs, step.Local.Folder)
-		cmdArgs = append(cmdArgs, makeRemotePath(step.Remote))
+		source = step.Local
+		target = step.Remote
 	}
+	errArr = isHealthy(source, "source", cli.Action, errArr)
+	errArr = isHealthy(target, "target", cli.Action, errArr)
+	cmdArr = append(cmdArr, source)
+	cmdArr = append(cmdArr, target)
 	return
 }
 
-func makeRemotePath(remote tRemote) string {
-	return strings.Join([]string{remote.Host, remote.Folder}, ":")
+func isHealthy(path, typ, action string, errArr []error) []error {
+	if rxMatch(path, "^[:/-_]$") {
+		errArr = append(
+			errArr, errors.New(action+" "+typ+" path seems short: "+path),
+		)
+	}
+	if isLocalPath(path) {
+		if isFolder(path) {
+			b, _ := isEmpty(path)
+			if b {
+				errArr = append(
+					errArr, errors.New(action+" "+typ+" folder empty: "+path),
+				)
+			}
+		}
+	}
+	return errArr
 }

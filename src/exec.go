@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -10,7 +11,7 @@ import (
 	"github.com/triole/logseal"
 )
 
-func runCmd(cmdBase string, cmdArgs []string) ([]byte, int, error) {
+func runCmd(cmdArr []string) ([]byte, int, error) {
 	var by []byte
 	var err error
 	var exitcode int
@@ -18,11 +19,11 @@ func runCmd(cmdBase string, cmdArgs []string) ([]byte, int, error) {
 	lg.Info(
 		"run command",
 		logseal.F{
-			"action": cli.Action, "cmd_base": cmdBase, "cmd_args": cmdArgs,
+			"action": cli.Action, "cmd": fmt.Sprintf("%+v", cmdArr),
 		},
 	)
-	if !cli.Print {
-		cmd := exec.Command(cmdBase, cmdArgs...)
+	if !cli.DryRun {
+		cmd := exec.Command(cmdArr[0], cmdArr[1:]...)
 		// mw := io.MultiWriter(&stdBuffer)
 		mw := io.MultiWriter(os.Stdout, &stdBuffer)
 
@@ -41,7 +42,7 @@ func runCmd(cmdBase string, cmdArgs []string) ([]byte, int, error) {
 			lg.IfErrError(
 				"exec failed",
 				logseal.F{
-					"cmd_base": cmdBase, "cmd_args": cmdArgs,
+					"action": cli.Action, "cmd": fmt.Sprintf("%+v", cmdArr),
 					"error": err, "output": string(by),
 				},
 			)
@@ -49,7 +50,7 @@ func runCmd(cmdBase string, cmdArgs []string) ([]byte, int, error) {
 			lg.Debug(
 				"exec successful",
 				logseal.F{
-					"cmd_base": cmdBase, "cmd_args": cmdArgs,
+					"action": cli.Action, "cmd": fmt.Sprintf("%+v", cmdArr),
 					"error": err, "output": string(by),
 				},
 			)

@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
+
+	"github.com/triole/logseal"
 )
 
 func cleanPath(s string) (r string) {
@@ -27,7 +30,7 @@ func pabs(pathstring string) string {
 	return r
 }
 
-func fileExists(path string) bool {
+func exists(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {
 		return true
@@ -40,20 +43,26 @@ func fileExists(path string) bool {
 
 func isFolder(fn string) (b bool) {
 	fi, err := os.Stat(fn)
-	if err != nil {
-		log.Fatal(err)
-	}
+	lg.IfErrFatal("path does not exist", logseal.F{"error": err})
 	b = fi.IsDir()
 	return
 }
 
-func isFolderEmpty(name string) (r bool) {
-	r = true
-	arr, _ := filepath.Glob(name + "*")
-	if len(arr) > 0 {
-		r = false
+func isEmpty(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
 	}
-	return
+	defer f.Close()
+	_, err = f.Readdirnames(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err
+}
+
+func isLocalPath(path string) bool {
+	return !strings.Contains(path, ":")
 }
 
 func pwd() string {
@@ -63,4 +72,10 @@ func pwd() string {
 		os.Exit(1)
 	}
 	return pwd
+}
+
+func rxMatch(rx string, str string) (b bool) {
+	re, _ := regexp.Compile(rx)
+	b = re.MatchString(str)
+	return
 }

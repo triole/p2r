@@ -1,15 +1,8 @@
 ---
 sync_steps:
-  - cmd:
-      base: rsync
-      args: ["-av", "--delete", "--chown={{.user}}:admins", "--exclude=acme"]
-      debug_arg: -n
-    local:
-      folder: {{.workdir}}/conf
-    remote:
-      host: remote_machine
-      folder: /etc/whatever
-
-tunnel:
-  local_port: 3333
-  remote_port: 80
+  - cmd: ["rsync", "-av", "--delete", "--chown={{.user}}:admins", "--exclude=acme"]
+    local: {{.confdir}}/
+    remote: remote_machine:/etc/whatever/
+  - cmd: ["scp"]
+    local: {{.confdir}}/
+    remote: remote_machine:/etc/whatever/

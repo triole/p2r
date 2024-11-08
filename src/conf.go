@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"os/user"
+	"path/filepath"
 	"text/template"
 
 	"github.com/triole/logseal"
@@ -21,8 +22,8 @@ func readConfig(filename string) (conf tConf) {
 		"can not unmarshal config", logseal.F{"path": filename, "error": err},
 	)
 	for idx, step := range conf.SyncSteps {
-		conf.SyncSteps[idx].Local.Folder = cleanPath(step.Local.Folder)
-		conf.SyncSteps[idx].Remote.Folder = cleanPath(step.Remote.Folder)
+		conf.SyncSteps[idx].Local = step.Local
+		conf.SyncSteps[idx].Remote = step.Remote
 	}
 	return
 }
@@ -33,6 +34,7 @@ func templateFile(conf string) (by []byte, err error) {
 	templ, err := template.New("conf").Parse(conf)
 	if err == nil {
 		templ.Execute(buf, map[string]interface{}{
+			"confdir": filepath.Dir(pabs(cli.Config)),
 			"workdir": pwd(),
 			"home":    ud["home"],
 			"uid":     ud["uid"],
