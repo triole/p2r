@@ -9,11 +9,8 @@ import (
 func runSync(steps tSyncSteps) {
 	for _, step := range steps {
 		cmdBase, cmdArgs := assembleCommand(step)
-		lg.Info("sync", logseal.F{"action": cli.Action, "cmd_base": cmdBase, "cmd_args": cmdArgs})
-		if !cli.Print {
-			_, _, err := runCmd(cmdBase, cmdArgs)
-			lg.IfErrFatal("sync failed", logseal.F{"error": err})
-		}
+		_, _, err := runCmd(cmdBase, cmdArgs)
+		lg.IfErrFatal("sync failed", logseal.F{"error": err})
 	}
 }
 

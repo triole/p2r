@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/triole/logseal"
 )
@@ -27,7 +28,8 @@ func main() {
 
 	switch cli.Action {
 	case "tun":
-		fmt.Printf("%+v\n", "TUNNEL")
+		cmdBase, cmdArgs := makeTunnelCommand(conf)
+		runCmd(cmdBase, cmdArgs)
 	case "pull", "push":
 		runSync(conf.SyncSteps)
 	default:
@@ -39,4 +41,17 @@ func main() {
 func displayInfo(conf tConf) {
 	s, _ := json.MarshalIndent(conf, "", "  ")
 	fmt.Println(string(s))
+}
+
+func makeTunnelCommand(conf tConf) (cmdBase string, cmdArgs []string) {
+	cmdBase = "ssh"
+	cmdArgs = append(cmdArgs, "-L")
+	cmdArgs = append(
+		cmdArgs,
+		strconv.Itoa(conf.Tunnel.LocalPort)+
+			":localhost:"+
+			strconv.Itoa(conf.Tunnel.RemotePort),
+	)
+	cmdArgs = append(cmdArgs, conf.SyncSteps[0].Remote.Host)
+	return
 }

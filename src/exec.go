@@ -11,41 +11,49 @@ import (
 )
 
 func runCmd(cmdBase string, cmdArgs []string) ([]byte, int, error) {
+	var by []byte
 	var err error
 	var exitcode int
 	var stdBuffer bytes.Buffer
+	lg.Info(
+		"run command",
+		logseal.F{
+			"action": cli.Action, "cmd_base": cmdBase, "cmd_args": cmdArgs,
+		},
+	)
+	if !cli.Print {
+		cmd := exec.Command(cmdBase, cmdArgs...)
+		// mw := io.MultiWriter(&stdBuffer)
+		mw := io.MultiWriter(os.Stdout, &stdBuffer)
 
-	cmd := exec.Command(cmdBase, cmdArgs...)
-	// mw := io.MultiWriter(&stdBuffer)
-	mw := io.MultiWriter(os.Stdout, &stdBuffer)
-
-	cmd.Stdout = mw
-	cmd.Stderr = mw
-	if err = cmd.Run(); err != nil {
-		if exiterr, ok := err.(*exec.ExitError); ok {
-			// the program has exited with an exit code != 0
-			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				exitcode = status.ExitStatus()
+		cmd.Stdout = mw
+		cmd.Stderr = mw
+		if err = cmd.Run(); err != nil {
+			if exiterr, ok := err.(*exec.ExitError); ok {
+				// the program has exited with an exit code != 0
+				if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+					exitcode = status.ExitStatus()
+				}
 			}
 		}
-	}
-	by := stdBuffer.Bytes()
-	if err != nil {
-		lg.IfErrError(
-			"exec failed",
-			logseal.F{
-				"cmd_base": cmdBase, "cmd_args": cmdArgs,
-				"error": err, "output": string(by),
-			},
-		)
-	} else {
-		lg.Debug(
-			"exec successful",
-			logseal.F{
-				"cmd_base": cmdBase, "cmd_args": cmdArgs,
-				"error": err, "output": string(by),
-			},
-		)
+		by = stdBuffer.Bytes()
+		if err != nil {
+			lg.IfErrError(
+				"exec failed",
+				logseal.F{
+					"cmd_base": cmdBase, "cmd_args": cmdArgs,
+					"error": err, "output": string(by),
+				},
+			)
+		} else {
+			lg.Debug(
+				"exec successful",
+				logseal.F{
+					"cmd_base": cmdBase, "cmd_args": cmdArgs,
+					"error": err, "output": string(by),
+				},
+			)
+		}
 	}
 	return by, exitcode, err
 }
