@@ -1,6 +1,6 @@
 package main
 
-type tConfig struct {
+type tConf struct {
 	SyncSteps tSyncSteps `yaml:"sync_steps"`
 	Tunnel    tTunnel    `yaml:"tunnel"`
 }

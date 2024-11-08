@@ -10,7 +10,7 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-func readConfig(filename string) (conf tConfig) {
+func readConfig(filename string) (conf tConf) {
 	by, err := os.ReadFile(filename)
 	lg.IfErrFatal(
 		"can not read file", logseal.F{"path": filename, "error": err},

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/triole/logseal"
@@ -27,7 +28,15 @@ func main() {
 	switch cli.Action {
 	case "tun":
 		fmt.Printf("%+v\n", "TUNNEL")
-	default:
+	case "pull", "push":
 		runSync(conf.SyncSteps)
+	default:
+		lg.Info("display read config file")
+		displayInfo(conf)
 	}
+}
+
+func displayInfo(conf tConf) {
+	s, _ := json.MarshalIndent(conf, "", "  ")
+	fmt.Println(string(s))
 }
