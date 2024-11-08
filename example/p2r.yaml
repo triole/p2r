@@ -3,7 +3,7 @@ sync_steps:
   - cmd:
       base: rsync
       args: ["-av", "--delete", "--chown={{.user}}:admins", "--exclude=acme"]
-      debug_arg: "-n"
+      debug_arg: -n
     local:
       folder: {{.workdir}}/conf
     remote:
