@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/triole/logseal"
@@ -22,9 +23,49 @@ func readConfig(filename string) (conf tConf) {
 		"can not unmarshal config", logseal.F{"path": filename, "error": err},
 	)
 	for idx, step := range conf.SyncSteps {
-		conf.SyncSteps[idx].Local = step.Local
-		conf.SyncSteps[idx].Remote = step.Remote
+		conf.SyncSteps[idx].Set.Local = parsePath(step.Local)
+		conf.SyncSteps[idx].Set.Remote = parsePath(step.Remote)
+		conf.SyncSteps[idx].Set.Command, conf.SyncSteps[idx].Set.Errors = assembleCommand(step)
 	}
+	return
+}
+
+func parsePath(pth string) (p tPath) {
+	p.FullPath = pth
+	p.Path = pth
+	p.IsFolder = nil
+	p.IsLocal = isLocalPath(p.FullPath)
+	p.IsHealthy, p.Errors = isHealthy(p)
+	if p.IsLocal {
+		p.IsFolder = isFolder(p.FullPath)
+		p.IsEmpty, _ = isEmpty(p.FullPath)
+	} else {
+		p.IsLocal = false
+		arr := strings.Split(p.FullPath, ":")
+		p.Machine = arr[0]
+		p.Path = arr[1]
+	}
+	return
+}
+
+func assembleCommand(step tSyncStep) (cmdArr []string, errArr []error) {
+	var source, target string
+	cmdArr = step.Cmd
+	if cmdArr[0] == "rsync" && cli.RsyncDryRun {
+		cmdArr = append(cmdArr, "-n")
+	}
+	if cli.Action == "pull" {
+		source = step.Set.Remote.FullPath
+		target = step.Set.Local.FullPath
+	}
+	if cli.Action == "push" {
+		source = step.Set.Local.FullPath
+		target = step.Set.Remote.FullPath
+	}
+	cmdArr = append(cmdArr, source)
+	cmdArr = append(cmdArr, target)
+	errArr = step.Set.Local.Errors
+	errArr = append(errArr, step.Set.Remote.Errors...)
 	return
 }
 

@@ -2,16 +2,14 @@ package main
 
 func list(steps tSyncSteps) {
 	for _, step := range steps {
-		fol1 := parsePath(step.Local)
-		listPath(fol1)
-		fol2 := parsePath(step.Remote)
-		listPath(fol2)
+		listPath(step.Set.Local)
+		listPath(step.Set.Remote)
 	}
 }
 
 func listPath(fol tPath) {
 	if fol.IsLocal {
-		runCmd([]string{"ls", "-lah", fol.Path})
+		runCmd([]string{"ls", "-lah", fol.FullPath})
 	} else {
 		runCmd([]string{"ssh", fol.Machine, "ls", "-lah", fol.Path})
 	}

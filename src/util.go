@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -61,6 +62,20 @@ func isEmpty(name string) (bool, error) {
 	return false, err
 }
 
+func isHealthy(pth tPath) (b bool, errArr []error) {
+	if rxMatch(pth.FullPath, "^[:/-_]$") {
+		errArr = append(
+			errArr, errors.New("path seems short: "+pth.FullPath),
+		)
+	}
+	if pth.isEmpty() {
+		errArr = append(
+			errArr, errors.New("folder empty: "+pth.FullPath),
+		)
+	}
+	return len(errArr) == 0, errArr
+}
+
 func isLocalPath(path string) bool {
 	return !strings.Contains(path, ":")
 }
@@ -77,29 +92,5 @@ func pwd() string {
 func rxMatch(rx string, str string) (b bool) {
 	re, _ := regexp.Compile(rx)
 	b = re.MatchString(str)
-	return
-}
-
-type tPath struct {
-	IsLocal  bool
-	Machine  string
-	Path     string
-	IsFolder interface{}
-	IsEmpty  interface{}
-}
-
-func parsePath(pth string) (p tPath) {
-	p.Path = pth
-	p.IsFolder = nil
-	p.IsLocal = isLocalPath(pth)
-	if p.IsLocal {
-		p.IsFolder = isFolder(p.Path)
-		p.IsEmpty, _ = isEmpty(p.Path)
-	} else {
-		p.IsLocal = false
-		arr := strings.Split(pth, ":")
-		p.Machine = arr[0]
-		p.Path = arr[1]
-	}
 	return
 }
