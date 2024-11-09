@@ -29,6 +29,8 @@ func main() {
 	switch cli.Action {
 	case "pull", "push":
 		runSync(conf.SyncSteps)
+	case "list":
+		list(conf.SyncSteps)
 	default:
 		lg.Info("display read config file")
 		displayInfo(conf)

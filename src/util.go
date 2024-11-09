@@ -79,3 +79,27 @@ func rxMatch(rx string, str string) (b bool) {
 	b = re.MatchString(str)
 	return
 }
+
+type tPath struct {
+	IsLocal  bool
+	Machine  string
+	Path     string
+	IsFolder interface{}
+	IsEmpty  interface{}
+}
+
+func parsePath(pth string) (p tPath) {
+	p.Path = pth
+	p.IsFolder = nil
+	p.IsLocal = isLocalPath(pth)
+	if p.IsLocal {
+		p.IsFolder = isFolder(p.Path)
+		p.IsEmpty, _ = isEmpty(p.Path)
+	} else {
+		p.IsLocal = false
+		arr := strings.Split(pth, ":")
+		p.Machine = arr[0]
+		p.Path = arr[1]
+	}
+	return
+}
