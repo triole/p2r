@@ -13,7 +13,7 @@ import (
 var (
 	BUILDTAGS      string
 	appName        = "p2r"
-	appDescription = "push, pull or tun to remote file systems"
+	appDescription = "push or pull remote file systems"
 	appMainversion = "0.1"
 )
 
