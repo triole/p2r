@@ -1,4 +1,4 @@
-# P2R
+# P2R ![build](https://github.com/triole/p2r/actions/workflows/build.yaml/badge.svg) ![test](https://github.com/triole/p2r/actions/workflows/test.yaml/badge.svg)
 
 <!-- toc -->
 
