@@ -19,7 +19,7 @@ var (
 
 var cli struct {
 	Action      string `help:"action to perform, can be: [${enum}]" arg:"" enum:"info,push,pull,list" default:"info"`
-	Config      string `help:"config file" default:"${configFile}" short:"f"`
+	Config      string `help:"config file" default:"${configFile}" short:"c"`
 	DryRun      bool   `help:"only print commands what would have been executed" short:"n"`
 	RsyncDryRun bool   `help:"enable rsync dry runs" short:"m"`
 	LogFile     string `help:"log file" default:"/dev/stdout"`
