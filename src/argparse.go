@@ -18,7 +18,7 @@ var (
 )
 
 var cli struct {
-	Action      string `help:"action to perform, can be: [${enum}]" arg:"" enum:"info,push,pull,list" default:"info"`
+	Action      string `kong:"-"`
 	Config      string `help:"config file" default:"${configFile}" short:"c"`
 	DryRun      bool   `help:"only print commands what would have been executed" short:"n"`
 	RsyncDryRun bool   `help:"enable rsync dry runs" short:"m"`
@@ -27,11 +27,29 @@ var cli struct {
 	LogNoColors bool   `help:"disable output colours, print plain text"`
 	LogJSON     bool   `help:"enable json log, instead of text one"`
 	VersionFlag bool   `help:"display version" short:"V"`
+
+	List struct {
+		Plain bool `help:"print plain list, file names only" short:"p"`
+	} `cmd:"" help:"list files matching the criteria"`
+
+	Pull struct {
+		Plain bool `help:"print plain list, file names only" short:"p"`
+	} `cmd:"" help:"list files matching the criteria"`
+
+	Push struct {
+		Plain bool `help:"print plain list, file names only" short:"p"`
+	} `cmd:"" help:"list files matching the criteria"`
+
+	Cmd struct {
+		Command string `help:"command which is defined in the config yaml" arg:""`
+	} `cmd:""`
+
+	Version struct{} `cmd:"" help:"display version"`
 }
 
 func parseArgs() {
 	curdir := pwd()
-	_ = kong.Parse(&cli,
+	ctx := kong.Parse(&cli,
 		kong.Name(appName),
 		kong.Description(appDescription),
 		kong.UsageOnError(),
@@ -45,14 +63,13 @@ func parseArgs() {
 			"configFile": filepath.Join(curdir, "p2r.yaml"),
 		},
 	)
-	// err := ctx.Run()
+	_ = ctx.Run()
 	// ctx.FatalIfErrorf(err)
-
-	if cli.VersionFlag {
+	cli.Action = ctx.Command()
+	if cli.Action == "version" {
 		printBuildTags(BUILDTAGS)
 		os.Exit(0)
 	}
-	// ctx.FatalIfErrorf(err)
 }
 
 func printBuildTags(buildtags string) {
@@ -60,4 +77,13 @@ func printBuildTags(buildtags string) {
 	s := regexp.ReplaceAllString(buildtags, "\n")
 	s = strings.Replace(s, "_subversion: ", "Version: "+appMainversion+".", -1)
 	fmt.Printf("%s\n", s)
+}
+
+func pwd() string {
+	pwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	return pwd
 }

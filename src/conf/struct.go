@@ -1,7 +1,15 @@
-package main
+package conf
 
-type tConf struct {
-	SyncSteps tSyncSteps `yaml:"sync_steps"`
+import "github.com/triole/logseal"
+
+type Conf struct {
+	ConfigFile  string
+	Action      string
+	DryRun      bool
+	RsyncDryRun bool
+	Lg          logseal.Logseal
+	SyncSteps   tSyncSteps `yaml:"sync_steps"`
+	Commands    tCommands  `yaml:"commands"`
 }
 
 type tSyncSteps []tSyncStep
@@ -31,24 +39,4 @@ type tPath struct {
 	Errors    []error
 }
 
-func (pth tPath) isFolder() (b bool) {
-	b = false
-	switch val := pth.IsFolder.(type) {
-	case bool:
-		if val {
-			b = true
-		}
-	}
-	return
-}
-
-func (pth tPath) isEmpty() (b bool) {
-	b = false
-	switch val := pth.IsEmpty.(type) {
-	case bool:
-		if val {
-			b = true
-		}
-	}
-	return
-}
+type tCommands map[string][][]string
