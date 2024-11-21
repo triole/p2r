@@ -15,7 +15,10 @@ var (
 func main() {
 	parseArgs()
 	lg = logseal.Init(cli.LogLevel, cli.LogFile, cli.LogNoColors, cli.LogJSON)
-	conf := conf.Init(cli.Config, cli.Action, cli.DryRun, cli.RsyncDryRun, lg)
+	conf := conf.Init(
+		cli.Config, cli.Action, cli.Cmd.Command,
+		cli.DryRun, cli.RsyncDryRun, lg,
+	)
 	conf.Lg.Info(
 		"start "+appName,
 		logseal.F{

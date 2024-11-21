@@ -5,6 +5,7 @@ import "github.com/triole/logseal"
 type Conf struct {
 	ConfigFile  string
 	Action      string
+	SubAction   string
 	DryRun      bool
 	RsyncDryRun bool
 	Lg          logseal.Logseal

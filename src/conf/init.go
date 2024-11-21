@@ -7,9 +7,10 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-func Init(filename, action string, dryRun, rsyncDryRun bool, lg logseal.Logseal) (conf Conf) {
+func Init(filename, action, subaction string, dryRun, rsyncDryRun bool, lg logseal.Logseal) (conf Conf) {
 	conf.ConfigFile = conf.pabs(filename)
 	conf.Action = action
+	conf.SubAction = subaction
 	conf.DryRun = dryRun
 	conf.RsyncDryRun = rsyncDryRun
 	conf.Lg = lg
@@ -37,13 +38,25 @@ func (conf *Conf) assembleCommands(configContent ConfigContent) (commands Comman
 		for _, step := range configContent.SyncSteps {
 			conf.Commands = append(conf.Commands, conf.assembleSyncCommand(step))
 		}
+	case "cmd":
+		if commands, ok := configContent.Commands[conf.SubAction]; ok {
+			for _, command := range commands {
+				var cmd Command
+				cmd.Cmd = command
+				conf.Commands = append(conf.Commands, cmd)
+			}
+		}
 	}
+
 	return
 }
 
 func (conf *Conf) assembleSyncCommand(step SyncStep) (cmd Command) {
 	local := conf.parsePath(step.Local)
 	remote := conf.parsePath(step.Remote)
+	if step.Cmd[0] == "rsync" && conf.RsyncDryRun {
+		step.Cmd = append(step.Cmd, "-n")
+	}
 	switch conf.Action {
 	case "pull":
 		cmd.Cmd = append(step.Cmd, remote.FullPath)

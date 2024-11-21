@@ -61,7 +61,7 @@ func parseArgs() {
 	)
 	_ = ctx.Run()
 	// ctx.FatalIfErrorf(err)
-	cli.Action = ctx.Command()
+	cli.Action = strings.Split(ctx.Command(), " ")[0]
 	if cli.Action == "version" {
 		printBuildTags(BUILDTAGS)
 		os.Exit(0)
