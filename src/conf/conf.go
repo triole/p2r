@@ -14,11 +14,17 @@ func (conf Conf) templateFile(str string) (by []byte, err error) {
 	if err == nil {
 		templ.Execute(buf, map[string]interface{}{
 			"confdir": filepath.Dir(conf.pabs(conf.ConfigFile)),
+			"CONFDIR": filepath.Dir(conf.pabs(conf.ConfigFile)),
 			"workdir": pwd(),
+			"WORKDIR": pwd(),
 			"home":    ud["home"],
+			"HOME":    ud["home"],
 			"uid":     ud["uid"],
+			"UID":     ud["uid"],
 			"gid":     ud["gid"],
+			"GID":     ud["gid"],
 			"user":    ud["username"],
+			"USER":    ud["username"],
 		})
 		by = buf.Bytes()
 	}

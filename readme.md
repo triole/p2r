@@ -16,15 +16,15 @@ A very simple and basic tool helping to synchronise and push files to remote mac
 ```go mdox-exec="tail -n +2 examples/p2r.yaml"
 sync_steps:
   - cmd: ["rsync", "-av", "--delete", "--chown={{.user}}:admins", "--exclude=acme"]
-    local: {{.confdir}}/
+    local: {{.CONFDIR}}/
     remote: remote_machine:/etc/whatever/
   - cmd: ["scp"]
-    local: {{.confdir}}/
+    local: {{.CONFDIR}}/
     remote: remote_machine:/etc/whatever/
 
 commands:
   update:
-    - ["scp", "/whatever/file", "remote:/etc/whatever/"]
+    - ["scp", "{{.HOME}}/whatever/file", "remote:/etc/whatever/"]
 ```
 
 ## Help
