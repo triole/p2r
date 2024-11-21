@@ -2,7 +2,7 @@ package conf
 
 import "strings"
 
-func (conf Conf) parsePath(pth string) (p tPath) {
+func (conf Conf) parsePath(pth string) (p Path) {
 	p.FullPath = pth
 	p.Path = pth
 	p.IsFolder = nil
@@ -20,7 +20,7 @@ func (conf Conf) parsePath(pth string) (p tPath) {
 	return
 }
 
-func (pth tPath) isFolder() (b bool) {
+func (pth Path) isFolder() (b bool) {
 	b = false
 	switch val := pth.IsFolder.(type) {
 	case bool:
@@ -31,7 +31,7 @@ func (pth tPath) isFolder() (b bool) {
 	return
 }
 
-func (pth tPath) isEmpty() (b bool) {
+func (pth Path) isEmpty() (b bool) {
 	b = false
 	switch val := pth.IsEmpty.(type) {
 	case bool:

@@ -8,27 +8,37 @@ type Conf struct {
 	DryRun      bool
 	RsyncDryRun bool
 	Lg          logseal.Logseal
-	SyncSteps   tSyncSteps `yaml:"sync_steps"`
-	Commands    tCommands  `yaml:"commands"`
+	Commands    Commands
 }
 
-type tSyncSteps []tSyncStep
+type Commands []Command
 
-type tSyncStep struct {
+type Command struct {
+	Cmd []string
+	Err []error
+}
+
+type ConfigContent struct {
+	SyncSteps SyncSteps             `yaml:"sync_steps"`
+	Commands  map[string][][]string `yaml:"commands"`
+}
+type SyncSteps []SyncStep
+
+type SyncStep struct {
 	Cmd    []string `yaml:"cmd"`
 	Local  string   `yaml:"local"`
 	Remote string   `yaml:"remote"`
-	Set    tSet
+	Set    Set
 }
 
-type tSet struct {
-	Local   tPath
-	Remote  tPath
+type Set struct {
+	Local   Path
+	Remote  Path
 	Command []string
 	Errors  []error
 }
 
-type tPath struct {
+type Path struct {
 	IsLocal   bool
 	Machine   string
 	Path      string
@@ -38,5 +48,3 @@ type tPath struct {
 	IsHealthy bool
 	Errors    []error
 }
-
-type tCommands map[string][][]string

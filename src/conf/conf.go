@@ -12,7 +12,7 @@ func isLocalPath(path string) bool {
 	return !strings.Contains(path, ":")
 }
 
-func (conf Conf) assembleCommand(step tSyncStep) (cmdArr []string, errArr []error) {
+func (conf Conf) assembleCommand(step SyncStep) (cmdArr []string, errArr []error) {
 	var source, target string
 	cmdArr = step.Cmd
 	if cmdArr[0] == "rsync" && conf.RsyncDryRun {

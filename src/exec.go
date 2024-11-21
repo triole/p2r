@@ -6,10 +6,28 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"p2r/src/conf"
 	"syscall"
 
 	"github.com/triole/logseal"
 )
+
+func runCommands(commands conf.Commands) {
+	for _, step := range commands {
+		if len(step.Err) == 0 {
+			_, _, err := runCmd(step.Cmd)
+			lg.IfErrFatal("sync failed", logseal.F{"error": err})
+		} else {
+			for _, el := range step.Err {
+				lg.Error(
+					"skip command", logseal.F{
+						"cmd": fmt.Sprintf("%+v", step.Cmd), "error": el,
+					},
+				)
+			}
+		}
+	}
+}
 
 func runCmd(cmdArr []string) ([]byte, int, error) {
 	var by []byte

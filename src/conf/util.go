@@ -11,7 +11,7 @@ import (
 	"github.com/triole/logseal"
 )
 
-func (conf Conf) isHealthy(pth tPath) (b bool, errArr []error) {
+func (conf Conf) isHealthy(pth Path) (b bool, errArr []error) {
 	if conf.rxMatch(pth.FullPath, "^[:/-_]$") {
 		errArr = append(
 			errArr, errors.New("path seems short: "+pth.FullPath),
