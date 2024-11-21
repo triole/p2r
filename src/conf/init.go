@@ -59,12 +59,12 @@ func (conf *Conf) assembleSyncCommand(step SyncStep) (cmd Command) {
 	}
 	switch conf.Action {
 	case "pull":
-		cmd.Cmd = append(step.Cmd, remote.FullPath)
+		step.Cmd = append(step.Cmd, remote.FullPath)
 		cmd.Cmd = append(step.Cmd, local.FullPath)
 		cmd.Err = append(cmd.Err, remote.Errors...)
 		cmd.Err = append(cmd.Err, local.Errors...)
 	case "push":
-		cmd.Cmd = append(step.Cmd, local.FullPath)
+		step.Cmd = append(step.Cmd, local.FullPath)
 		cmd.Cmd = append(step.Cmd, remote.FullPath)
 		cmd.Err = append(cmd.Err, local.Errors...)
 		cmd.Err = append(cmd.Err, remote.Errors...)
