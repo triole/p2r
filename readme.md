@@ -21,6 +21,10 @@ sync_steps:
   - cmd: ["scp"]
     local: {{.confdir}}/
     remote: remote_machine:/etc/whatever/
+
+commands:
+  update:
+    - ["scp", "/whatever/file", "remote:/etc/whatever/"]
 ```
 
 ## Help
@@ -29,12 +33,9 @@ sync_steps:
 
 push or pull remote file systems
 
-Arguments:
-  [<action>]    action to perform, can be: [info,push,pull,list]
-
 Flags:
   -h, --help                      Show context-sensitive help.
-  -f, --config="$(pwd)/p2r.yaml"
+  -c, --config="$(pwd)/p2r.yaml"
                                   config file
   -n, --dry-run                   only print commands what would have been
                                   executed
@@ -44,4 +45,12 @@ Flags:
       --log-no-colors             disable output colours, print plain text
       --log-json                  enable json log, instead of text one
   -V, --version-flag              display version
+
+Commands:
+  pull       list files matching the criteria
+  push       list files matching the criteria
+  cmd        run a command defined in the config yaml
+  version    display version
+
+Run "p2r <command> --help" for more information on a command.
 ```

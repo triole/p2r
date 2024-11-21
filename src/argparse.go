@@ -37,8 +37,8 @@ var cli struct {
 	} `cmd:"" help:"list files matching the criteria"`
 
 	Cmd struct {
-		Command string `help:"command which is defined in the config yaml" arg:""`
-	} `cmd:""`
+		Command string `help:"run a command defined in the config yaml" arg:""`
+	} `cmd:"" help:"run a command defined in the config yaml"`
 
 	Version struct{} `cmd:"" help:"display version"`
 }
