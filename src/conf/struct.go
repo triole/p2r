@@ -44,6 +44,7 @@ type Path struct {
 	Machine   string
 	Path      string
 	FullPath  string
+	Exists    bool
 	IsFolder  interface{}
 	IsEmpty   interface{}
 	IsHealthy bool

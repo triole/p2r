@@ -25,6 +25,18 @@ func (conf Conf) isHealthy(pth Path) (b bool, errArr []error) {
 	return len(errArr) == 0, errArr
 }
 
+func (conf Conf) exists(path string) (b bool, errArr []error) {
+	_, err := os.Stat(path)
+	errArr = append(errArr, err)
+	if err == nil {
+		return true, errArr
+	}
+	if os.IsNotExist(err) {
+		return false, errArr
+	}
+	return true, errArr
+}
+
 func (conf Conf) isFolder(fn string) (b bool) {
 	fi, err := os.Stat(fn)
 	conf.Lg.IfErrFatal("path does not exist", logseal.F{"error": err})
@@ -45,12 +57,6 @@ func (conf Conf) isEmpty(name string) (bool, error) {
 	return false, err
 }
 
-func (conf Conf) rxMatch(rx string, str string) (b bool) {
-	re, _ := regexp.Compile(rx)
-	b = re.MatchString(str)
-	return
-}
-
 func (conf Conf) pabs(pathstring string) string {
 	r, err := filepath.Abs(pathstring)
 	if err != nil {
@@ -67,4 +73,10 @@ func pwd() string {
 		os.Exit(1)
 	}
 	return pwd
+}
+
+func (conf Conf) rxMatch(rx string, str string) (b bool) {
+	re, _ := regexp.Compile(rx)
+	b = re.MatchString(str)
+	return
 }

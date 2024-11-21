@@ -5,6 +5,7 @@ import "strings"
 func (conf Conf) parsePath(pth string) (p Path) {
 	p.FullPath = pth
 	p.Path = pth
+	p.Exists, p.Errors = conf.exists(p.FullPath)
 	p.IsFolder = nil
 	p.IsLocal = conf.isLocalPath(p.FullPath)
 	p.IsHealthy, p.Errors = conf.isHealthy(p)
