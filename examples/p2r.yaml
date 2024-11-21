@@ -6,3 +6,7 @@ sync_steps:
   - cmd: ["scp"]
     local: {{.confdir}}/
     remote: remote_machine:/etc/whatever/
+
+commands:
+  update:
+    - ["scp", "/whatever/file", "remote:/etc/whatever/"]
