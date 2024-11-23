@@ -14,7 +14,13 @@ func Init(filename, action, subaction string, dryRun, rsyncDryRun bool, lg logse
 	conf.DryRun = dryRun
 	conf.RsyncDryRun = rsyncDryRun
 	conf.Lg = lg
-	configContent := conf.expand()
+	var configContent ConfigContent
+	if conf.Action == "init" {
+		conf.InitExample()
+		os.Exit(0)
+	} else {
+		configContent = conf.expand()
+	}
 	conf.assembleCommands(configContent)
 	return conf
 }

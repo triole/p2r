@@ -1,0 +1,14 @@
+---
+sync_steps:
+  - cmd: ["rsync", "-av", "--delete", "--chown={{.user}}:admins", "--exclude=acme"]
+    local: {{.CONFDIR}}/
+    remote: remote_machine:/etc/whatever/
+  - cmd: ["scp"]
+    local: {{.CONFDIR}}/
+    remote: remote_machine:/etc/whatever/
+
+commands:
+  update:
+    - ["scp", "{{.HOME}}/whatever/file", "remote:/etc/whatever/"]
+  ls:
+    - ["ls", "lah"]

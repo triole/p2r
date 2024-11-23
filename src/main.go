@@ -5,6 +5,8 @@ import (
 
 	"p2r/src/conf"
 
+	_ "embed"
+
 	"github.com/triole/logseal"
 )
 
@@ -28,5 +30,10 @@ func main() {
 			"log-level": cli.LogLevel,
 		})
 	conf.Lg.Debug("read config", logseal.F{"config": fmt.Sprintf("%+v", conf)})
-	runCommands(conf.Commands)
+
+	if conf.Action == "init" {
+		conf.InitExample()
+	} else {
+		runCommands(conf.Commands)
+	}
 }

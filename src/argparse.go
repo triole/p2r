@@ -40,6 +40,10 @@ var cli struct {
 		Command string `help:"run a command defined in the config yaml" arg:""`
 	} `cmd:"" help:"run a command defined in the config yaml"`
 
+	Init struct {
+		Plain bool `help:"init a config template to customise" short:"i"`
+	} `cmd:"" help:"init a config template to customise" short:"i"`
+
 	Version struct{} `cmd:"" help:"display version"`
 }
 

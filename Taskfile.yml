@@ -20,6 +20,7 @@ tasks:
   build:
     desc: build binary using remote ghwfe script, requires curl
     cmds:
+      - cmd: cp examples/p2r.yaml src/
       - cmd: |
           export SOURCE_FOLDER={{.SOURCE_FOLDER}}
           curl -sL https://raw.githubusercontent.com/triole/ghwfe/master/sh/go_build.sh | bash
