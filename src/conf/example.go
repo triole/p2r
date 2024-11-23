@@ -13,6 +13,10 @@ var exampleConf string
 func (conf Conf) InitExample() {
 	b, _ := conf.exists(conf.ConfigFile)
 	if !b {
+		conf.Lg.Info(
+			"create example conf",
+			logseal.F{"path": conf.ConfigFile},
+		)
 		err := os.WriteFile(conf.ConfigFile, []byte(exampleConf), 0644)
 		if err != nil {
 			conf.Lg.Error(
