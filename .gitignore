@@ -6,4 +6,4 @@ go.trace
 secret.toml
 conf.yaml
 
-src/p2r.yaml
+src/conf/p2r.yaml
