@@ -10,3 +10,5 @@ sync_steps:
 commands:
   update:
     - ["scp", "{{.HOME}}/whatever/file", "remote:/etc/whatever/"]
+  ls:
+    - ["ls", "lah"]
