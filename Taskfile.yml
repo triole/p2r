@@ -17,10 +17,14 @@ tasks:
           export SOURCE_FOLDER={{.SOURCE_FOLDER}}
           curl -sL https://raw.githubusercontent.com/triole/ghwfe/master/sh/go_add_sub_packages.sh | bash
 
+  prep:
+    cmds:
+      - cmd: cp examples/p2r.yaml src/conf/
+
   build:
     desc: build binary using remote ghwfe script, requires curl
     cmds:
-      - cmd: cp examples/p2r.yaml src/conf/
+      - task: prep
       - cmd: |
           export SOURCE_FOLDER={{.SOURCE_FOLDER}}
           curl -sL https://raw.githubusercontent.com/triole/ghwfe/master/sh/go_build.sh | bash
@@ -31,6 +35,7 @@ tasks:
       - "{{.SOURCE_FOLDER}}/*"
     method: timestamp
     cmds:
+      - task: prep
       - cmd: >-
           go test -trace go.trace -race -cover -bench=. {{.SOURCE_FOLDER}}/*.go
 
