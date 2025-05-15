@@ -19,14 +19,14 @@ func main() {
 	lg = logseal.Init(cli.LogLevel, cli.LogFile, cli.LogNoColors, cli.LogJSON)
 	conf := conf.Init(
 		cli.Config, cli.Action, cli.Cmd.Command,
-		cli.DryRun, cli.RsyncDryRun, lg,
+		cli.PrintOnly, cli.RsyncDryRun, lg,
 	)
 	conf.Lg.Info(
 		"start "+appName,
 		logseal.F{
 			"config":    conf.ConfigFile,
 			"action":    conf.Action,
-			"dry-run":   cli.DryRun,
+			"dry-run":   cli.PrintOnly,
 			"log-level": cli.LogLevel,
 		})
 	conf.Lg.Debug("read config", logseal.F{"config": fmt.Sprintf("%+v", conf)})

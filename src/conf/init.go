@@ -61,7 +61,7 @@ func (conf *Conf) assembleSyncCommand(step SyncStep) (cmd Command) {
 	local := conf.parsePath(step.Local)
 	remote := conf.parsePath(step.Remote)
 	if step.Cmd[0] == "rsync" && conf.RsyncDryRun {
-		step.Cmd = append(step.Cmd, "-n")
+		step.Cmd = append(step.Cmd, "--dry-run")
 	}
 	switch conf.Action {
 	case "pull":

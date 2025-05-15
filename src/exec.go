@@ -40,7 +40,7 @@ func runCmd(cmdArr []string) ([]byte, int, error) {
 			"action": cli.Action, "cmd": fmt.Sprintf("%+v", cmdArr),
 		},
 	)
-	if !cli.DryRun {
+	if !cli.PrintOnly {
 		cmd := exec.Command(cmdArr[0], cmdArr[1:]...)
 		// mw := io.MultiWriter(&stdBuffer)
 		mw := io.MultiWriter(os.Stdout, &stdBuffer)

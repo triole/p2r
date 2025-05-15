@@ -20,8 +20,8 @@ var (
 var cli struct {
 	Action      string `kong:"-" enum:"pull,push,cmd,info" default:"info"`
 	Config      string `help:"config file" default:"${configFile}" short:"c"`
-	DryRun      bool   `help:"only print commands what would have been executed" short:"n"`
-	RsyncDryRun bool   `help:"enable rsync dry runs" short:"m"`
+	PrintOnly   bool   `help:"only print commands what would have been executed" short:"p"`
+	RsyncDryRun bool   `help:"enable rsync dry runs" short:"n"`
 	LogFile     string `help:"log file" default:"/dev/stdout"`
 	LogLevel    string `help:"log level, can be: [${enum}]" default:"info" enum:"trace,debug,info,error"`
 	LogNoColors bool   `help:"disable output colours, print plain text"`
@@ -29,11 +29,11 @@ var cli struct {
 	VersionFlag bool   `help:"display version" short:"V"`
 
 	Pull struct {
-		Plain bool `help:"print plain list, file names only" short:"p"`
+		Plain bool `help:"print plain list, file names only" short:"l"`
 	} `cmd:"" help:"list files matching the criteria"`
 
 	Push struct {
-		Plain bool `help:"print plain list, file names only" short:"p"`
+		Plain bool `help:"print plain list, file names only" short:"l"`
 	} `cmd:"" help:"list files matching the criteria"`
 
 	Cmd struct {
