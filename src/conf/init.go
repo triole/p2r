@@ -30,7 +30,7 @@ func (conf *Conf) expand() (configContent ConfigContent) {
 	conf.Lg.IfErrFatal(
 		"can not read file", logseal.F{"path": conf.ConfigFile, "error": err},
 	)
-	by, err = conf.templateFile(string(by))
+	by, _ = conf.templateFile(string(by))
 	err = yaml.Unmarshal(by, &configContent)
 	conf.Lg.IfErrFatal(
 		"can not unmarshal config", logseal.F{"path": conf.ConfigFile, "error": err},
@@ -53,7 +53,6 @@ func (conf *Conf) assembleCommands(configContent ConfigContent) (commands Comman
 			}
 		}
 	}
-
 	return
 }
 

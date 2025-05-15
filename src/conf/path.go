@@ -32,16 +32,16 @@ func (pth Path) isEmpty() (b bool) {
 	return
 }
 
-func (pth Path) isFolder() (b bool) {
-	b = false
-	switch val := pth.IsFolder.(type) {
-	case bool:
-		if val {
-			b = true
-		}
-	}
-	return
-}
+// func (pth Path) isFolder() (b bool) {
+// 	b = false
+// 	switch val := pth.IsFolder.(type) {
+// 	case bool:
+// 		if val {
+// 			b = true
+// 		}
+// 	}
+// 	return
+// }
 
 func (conf Conf) isLocalPath(path string) bool {
 	return !strings.Contains(path, ":")
