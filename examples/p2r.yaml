@@ -5,8 +5,9 @@ sync_steps:
       - -av
       - --delete
       - --chown=jim:jim
-      - --exclude=.bash*
-      - --exclude=.docker/
+      - --exclude=/.bash*
+      - --exclude=/.docker/
+      - --exclude=/vol/
       - --exclude=/conf.toml
     local: {{.CONFDIR}}/
     remote: remote_machine:/etc/whatever/
