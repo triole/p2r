@@ -1,9 +1,16 @@
 ---
 sync_steps:
-  - cmd: ["rsync", "-av", "--delete", "--chown={{.user}}:admins", "--exclude=acme"]
+  - cmd:
+      - rsync
+      - -av
+      - --delete
+      - --chown=jim:jim
+      - --exclude=.bash*
+      - --exclude=.docker/
+      - --exclude=/conf.toml
     local: {{.CONFDIR}}/
     remote: remote_machine:/etc/whatever/
-  - cmd: ["scp"]
+  - cmd: ["scp", "-rp"]
     local: {{.CONFDIR}}/
     remote: remote_machine:/etc/whatever/
 
