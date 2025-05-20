@@ -35,11 +35,11 @@ func (conf *Conf) expand() (configContent ConfigContent) {
 	conf.Lg.IfErrFatal(
 		"can not unmarshal config", logseal.F{"path": conf.ConfigFile, "error": err},
 	)
-	conf.Lg.Debug(configContent)
+	conf.Lg.Debug("config content", logseal.F{"content": configContent})
 	return
 }
 
-func (conf *Conf) assembleCommands(configContent ConfigContent) (commands Commands) {
+func (conf *Conf) assembleCommands(configContent ConfigContent) {
 	switch conf.Action {
 	case "pull", "push":
 		for _, step := range configContent.SyncSteps {
@@ -54,7 +54,7 @@ func (conf *Conf) assembleCommands(configContent ConfigContent) (commands Comman
 			}
 		}
 	}
-	return
+	conf.Lg.Debug("commands set", logseal.F{"commands": conf.Commands})
 }
 
 func (conf *Conf) assembleSyncCommands(step SyncStep) (cmds []Command) {

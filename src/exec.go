@@ -13,6 +13,10 @@ import (
 )
 
 func runCommands(commands conf.Commands) {
+	if len(commands) < 1 {
+		lg.Error("no command given")
+		os.Exit(1)
+	}
 	for _, step := range commands {
 		if len(step.Err) == 0 {
 			_, _, err := runCmd(step.Cmd)

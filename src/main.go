@@ -31,9 +31,14 @@ func main() {
 		})
 	conf.Lg.Debug("read config", logseal.F{"config": fmt.Sprintf("%+v", conf)})
 
-	if conf.Action == "init" {
-		conf.InitExample()
+	if cli.Cmd.List {
+		conf.ListAvailableCommands()
 	} else {
-		runCommands(conf.Commands)
+		switch conf.Action {
+		case "init":
+			conf.InitExample()
+		default:
+			runCommands(conf.Commands)
+		}
 	}
 }

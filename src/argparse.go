@@ -29,19 +29,17 @@ var cli struct {
 	VersionFlag bool   `help:"display version" short:"V"`
 
 	Pull struct {
-		Plain bool `help:"print plain list, file names only" short:"l"`
 	} `cmd:"" help:"list files matching the criteria"`
 
 	Push struct {
-		Plain bool `help:"print plain list, file names only" short:"l"`
 	} `cmd:"" help:"list files matching the criteria"`
 
 	Cmd struct {
-		Command string `help:"run a command defined in the config yaml" arg:""`
+		Command string `help:"run a command defined in the config yaml" optional:"" arg:""`
+		List    bool   `help:"list available commands" short:"l"`
 	} `cmd:"" help:"run a command defined in the config yaml"`
 
 	Init struct {
-		Plain bool `help:"init a config template to customise" short:"i"`
 	} `cmd:"" help:"init a config template to customise" short:"i"`
 
 	Version struct{} `cmd:"" help:"display version"`
