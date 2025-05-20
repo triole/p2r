@@ -15,16 +15,33 @@ A very simple and basic tool helping to synchronise and push files to remote mac
 
 ```go mdox-exec="tail -n +2 examples/p2r.yaml"
 sync_steps:
-  - cmd: ["rsync", "-av", "--delete", "--chown={{.user}}:admins", "--exclude=acme"]
-    local: {{.CONFDIR}}/
-    remote: remote_machine:/etc/whatever/
-  - cmd: ["scp"]
-    local: {{.CONFDIR}}/
-    remote: remote_machine:/etc/whatever/
+  - cmd:
+      - rsync
+      - -av
+      - --delete
+      - --chown=jim:jim
+      - --exclude=/.bash*
+      - --exclude=/.docker/
+      - --exclude=/vol/
+      - --exclude=/conf.toml
+    sources:
+      - {{.HOME}}/
+      - {{.CONFDIR}}/
+    targets:
+      - remote_machine:/etc/target1/
+      - remote_machine:/etc/target2/
+      - remote_machine:/etc/target3/
+  - cmd: ["scp", "-rp"]
+    sources:
+      - {{.CONFDIR}}/
+    targets:
+      - remote_machine:/etc/whatever/
 
 commands:
   update:
     - ["scp", "{{.HOME}}/whatever/file", "remote:/etc/whatever/"]
+  ls:
+    - ["ls", "lah"]
 ```
 
 ## Help
@@ -37,9 +54,9 @@ Flags:
   -h, --help                      Show context-sensitive help.
   -c, --config="$(pwd)/p2r.yaml"
                                   config file
-  -n, --dry-run                   only print commands what would have been
+  -p, --print-only                only print commands what would have been
                                   executed
-  -m, --rsync-dry-run             enable rsync dry runs
+  -n, --rsync-dry-run             enable rsync dry runs
       --log-file="/dev/stdout"    log file
       --log-level="info"          log level, can be: [trace,debug,info,error]
       --log-no-colors             disable output colours, print plain text
@@ -50,6 +67,7 @@ Commands:
   pull       list files matching the criteria
   push       list files matching the criteria
   cmd        run a command defined in the config yaml
+  init       init a config template to customise
   version    display version
 
 Run "p2r <command> --help" for more information on a command.
