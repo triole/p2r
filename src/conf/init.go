@@ -35,6 +35,7 @@ func (conf *Conf) expand() (configContent ConfigContent) {
 	conf.Lg.IfErrFatal(
 		"can not unmarshal config", logseal.F{"path": conf.ConfigFile, "error": err},
 	)
+	conf.Lg.Debug(configContent)
 	return
 }
 
@@ -42,7 +43,7 @@ func (conf *Conf) assembleCommands(configContent ConfigContent) (commands Comman
 	switch conf.Action {
 	case "pull", "push":
 		for _, step := range configContent.SyncSteps {
-			conf.Commands = append(conf.Commands, conf.assembleSyncCommand(step))
+			conf.Commands = append(conf.Commands, conf.assembleSyncCommands(step)...)
 		}
 	case "cmd":
 		if commands, ok := configContent.Commands[conf.SubAction]; ok {
@@ -56,23 +57,29 @@ func (conf *Conf) assembleCommands(configContent ConfigContent) (commands Comman
 	return
 }
 
-func (conf *Conf) assembleSyncCommand(step SyncStep) (cmd Command) {
-	local := conf.parsePath(step.Local)
-	remote := conf.parsePath(step.Remote)
+func (conf *Conf) assembleSyncCommands(step SyncStep) (cmds []Command) {
+	sources := conf.parsePathList(step.Sources)
+	targets := conf.parsePathList(step.Targets)
+
+	if conf.Action == "pull" {
+		temp := sources
+		sources = targets
+		targets = temp
+	}
+
 	if step.Cmd[0] == "rsync" && conf.RsyncDryRun {
 		step.Cmd = append(step.Cmd, "--dry-run")
 	}
-	switch conf.Action {
-	case "pull":
-		step.Cmd = append(step.Cmd, remote.FullPath)
-		cmd.Cmd = append(step.Cmd, local.FullPath)
-		cmd.Err = append(cmd.Err, remote.Errors...)
-		cmd.Err = append(cmd.Err, local.Errors...)
-	case "push":
-		step.Cmd = append(step.Cmd, local.FullPath)
-		cmd.Cmd = append(step.Cmd, remote.FullPath)
-		cmd.Err = append(cmd.Err, local.Errors...)
-		cmd.Err = append(cmd.Err, remote.Errors...)
+	for _, source := range sources {
+		for _, target := range targets {
+			cmd := Command{}
+			cmd.Cmd = append(cmd.Cmd, step.Cmd...)
+			cmd.Cmd = append(cmd.Cmd, source.FullPath)
+			cmd.Cmd = append(cmd.Cmd, target.FullPath)
+			cmd.Err = append(cmd.Err, source.Errors...)
+			cmd.Err = append(cmd.Err, target.Errors...)
+			cmds = append(cmds, cmd)
+		}
 	}
 	return
 }

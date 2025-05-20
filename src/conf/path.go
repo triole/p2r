@@ -1,6 +1,15 @@
 package conf
 
-import "strings"
+import (
+	"strings"
+)
+
+func (conf Conf) parsePathList(pths []string) (plist []Path) {
+	for _, pth := range pths {
+		plist = append(plist, conf.parsePath(pth))
+	}
+	return
+}
 
 func (conf Conf) parsePath(pth string) (p Path) {
 	p.FullPath = pth

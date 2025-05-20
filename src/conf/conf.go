@@ -37,7 +37,7 @@ func (conf Conf) getUserdataMap() map[string]string {
 		panic(err)
 	}
 	m := make(map[string]string)
-	m["home"] = user.HomeDir + "/"
+	m["home"] = user.HomeDir
 	m["uid"] = user.Uid
 	m["gid"] = user.Gid
 	m["username"] = user.Username

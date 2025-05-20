@@ -5,14 +5,22 @@ sync_steps:
       - -av
       - --delete
       - --chown=jim:jim
-      - --exclude=.bash*
-      - --exclude=.docker/
+      - --exclude=/.bash*
+      - --exclude=/.docker/
+      - --exclude=/vol/
       - --exclude=/conf.toml
-    local: {{.CONFDIR}}/
-    remote: remote_machine:/etc/whatever/
+    sources:
+      - {{.HOME}}/
+      - {{.CONFDIR}}/
+    targets:
+      - remote_machine:/etc/target1/
+      - remote_machine:/etc/target2/
+      - remote_machine:/etc/target3/
   - cmd: ["scp", "-rp"]
-    local: {{.CONFDIR}}/
-    remote: remote_machine:/etc/whatever/
+    sources:
+      - {{.CONFDIR}}/
+    targets:
+      - remote_machine:/etc/whatever/
 
 commands:
   update:

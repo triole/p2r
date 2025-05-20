@@ -26,10 +26,10 @@ type ConfigContent struct {
 type SyncSteps []SyncStep
 
 type SyncStep struct {
-	Cmd    []string `yaml:"cmd"`
-	Local  string   `yaml:"local"`
-	Remote string   `yaml:"remote"`
-	Set    Set
+	Cmd     []string `yaml:"cmd"`
+	Sources []string `yaml:"sources"`
+	Targets []string `yaml:"targets"`
+	Set     Set
 }
 
 type Set struct {
