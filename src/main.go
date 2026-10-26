@@ -4,20 +4,19 @@ import (
 	"fmt"
 
 	"p2r/src/conf"
-
-	"github.com/triole/logseal"
+	"p2r/src/logger"
 )
 
 var (
-	lg logseal.Logseal
+	lg *logger.Logger
 )
 
 func main() {
 	// Parse command line arguments
 	parseArgs()
 
-	// Initialize logger
-	lg = logseal.Init(cli.LogLevel, cli.LogFile, cli.LogNoColors, cli.LogJSON)
+	// Initialize logger with zero dependencies
+	lg = logger.NewLogger(cli.LogLevel, cli.LogFile, cli.LogNoColors)
 
 	// Build configuration
 	cfg := conf.NewConfig(
@@ -30,15 +29,12 @@ func main() {
 	)
 
 	// Log startup information
-	cfg.Lg.Info(
-		"starting "+appName,
-		logseal.F{
-			"config":    cfg.ConfigFile,
-			"action":    cfg.Action,
-			"dry-run":   cli.PrintOnly,
-			"log-level": cli.LogLevel,
-		},
-	)
+	lg.Info("starting "+appName, map[string]interface{}{
+		"config":    cfg.ConfigFile,
+		"action":    cfg.Action,
+		"dry-run":   cli.PrintOnly,
+		"log-level": cli.LogLevel,
+	})
 
 	// Handle different command modes
 	if cli.Cmd.List {
@@ -58,7 +54,7 @@ func main() {
 	default:
 		// Execute the action
 		if err := executeAction(cfg); err != nil {
-			cfg.Lg.Fatal("execution failed", logseal.F{"error": err})
+			cfg.Lg.Fatal("execution failed", map[string]interface{}{"error": err})
 		}
 	}
 }
@@ -71,7 +67,7 @@ func executeAction(cfg *conf.Config) error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	cfg.Lg.Debug("config loaded", logseal.F{"config": fmt.Sprintf("%+v", configContent)})
+	cfg.Lg.Debug("config loaded", map[string]interface{}{"config": fmt.Sprintf("%+v", configContent)})
 
 	// Build commands based on action
 	var commands []conf.ExecCommand

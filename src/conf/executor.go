@@ -7,18 +7,18 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/triole/logseal"
+	"p2r/src/logger"
 )
 
 // Executor handles command execution.
 type Executor struct {
-	Lg        logseal.Logseal
+	Lg        *logger.Logger
 	PrintOnly bool
 	Action    string
 }
 
 // NewExecutor creates a new Executor instance.
-func NewExecutor(lg logseal.Logseal, printOnly bool, action string) *Executor {
+func NewExecutor(lg *logger.Logger, printOnly bool, action string) *Executor {
 	return &Executor{
 		Lg:        lg,
 		PrintOnly: printOnly,
@@ -29,7 +29,7 @@ func NewExecutor(lg logseal.Logseal, printOnly bool, action string) *Executor {
 // ExecuteCommands runs a list of commands.
 func (e *Executor) ExecuteCommands(commands []ExecCommand, dryRun bool, rsyncDryRun bool) error {
 	if len(commands) == 0 {
-		e.Lg.Error("no commands to execute")
+		e.Lg.Error("no commands to execute", nil)
 		return fmt.Errorf("no commands provided")
 	}
 
@@ -45,7 +45,7 @@ func (e *Executor) ExecuteCommands(commands []ExecCommand, dryRun bool, rsyncDry
 
 		if len(cmd.Err) > 0 {
 			for _, err := range cmd.Err {
-				e.Lg.Warn("skipping command with errors", logseal.F{
+				e.Lg.Warn("skipping command with errors", map[string]interface{}{
 					"index": i,
 					"cmd":   fmt.Sprintf("%+v", cmd.Cmd),
 					"error": err,
@@ -55,7 +55,7 @@ func (e *Executor) ExecuteCommands(commands []ExecCommand, dryRun bool, rsyncDry
 		}
 
 		if _, exitCode, err := e.runCommand(cmdCopy); err != nil {
-			e.Lg.Error("command execution failed", logseal.F{
+			e.Lg.Error("command execution failed", map[string]interface{}{
 				"index":     i,
 				"cmd":       fmt.Sprintf("%+v", cmdCopy),
 				"exit_code": exitCode,
@@ -77,7 +77,7 @@ func (e *Executor) runCommand(cmdArr []string) ([]byte, int, error) {
 		return nil, 0, fmt.Errorf("empty command array")
 	}
 
-	e.Lg.Info("executing command", logseal.F{
+	e.Lg.Info("executing command", map[string]interface{}{
 		"action": e.Action,
 		"cmd":    fmt.Sprintf("%+v", cmdArr),
 	})
@@ -101,7 +101,7 @@ func (e *Executor) runCommand(cmdArr []string) ([]byte, int, error) {
 				exitCode = status.ExitStatus()
 			}
 		}
-		e.Lg.Debug("command failed", logseal.F{
+		e.Lg.Debug("command failed", map[string]interface{}{
 			"action": e.Action,
 			"cmd":    fmt.Sprintf("%+v", cmdArr),
 			"error":  err,
@@ -110,7 +110,7 @@ func (e *Executor) runCommand(cmdArr []string) ([]byte, int, error) {
 		return nil, exitCode, err
 	}
 
-	e.Lg.Debug("command completed successfully", logseal.F{
+	e.Lg.Debug("command completed successfully", map[string]interface{}{
 		"action": e.Action,
 		"cmd":    fmt.Sprintf("%+v", cmdArr),
 		"exit":   exitCode,
@@ -121,7 +121,7 @@ func (e *Executor) runCommand(cmdArr []string) ([]byte, int, error) {
 
 // ListCommands displays all available commands from config.
 func (e *Executor) ListCommands(configContent ConfigContent) {
-	e.Lg.Info("available commands:")
+	e.Lg.Info("available commands:", nil)
 	for key, commands := range configContent.Commands {
 		fmt.Printf("%s:\n", key)
 		for _, cmd := range commands {

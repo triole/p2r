@@ -1,7 +1,7 @@
 package conf
 
 import (
-	"github.com/triole/logseal"
+	"p2r/src/logger"
 )
 
 // Config represents the main configuration wrapper.
@@ -11,7 +11,7 @@ type Config struct {
 	SubAction   string
 	DryRun      bool
 	RsyncDryRun bool
-	Lg          logseal.Logseal
+	Lg          *logger.Logger
 	Parser      *Parser
 	Validator   *Validator
 	Executor    *Executor
@@ -24,7 +24,7 @@ func NewConfig(
 	subAction string,
 	dryRun bool,
 	rsyncDryRun bool,
-	logger logseal.Logseal,
+	logger *logger.Logger,
 ) *Config {
 
 	parser := NewParser(configFile, logger)

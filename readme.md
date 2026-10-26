@@ -1,10 +1,9 @@
 # P2R ![build](https://github.com/triole/p2r/actions/workflows/build.yaml/badge.svg) ![test](https://github.com/triole/p2r/actions/workflows/test.yaml/badge.svg)
 
 <!-- toc -->
-
 - [Synopsis](#synopsis)
 - [Config example](#config-example)
-
+- [Help](#help)
 <!-- /toc -->
 
 ## Synopsis
@@ -25,15 +24,15 @@ sync_steps:
       - --exclude=/vol/
       - --exclude=/conf.toml
     sources:
-      - {{.HOME}}/
-      - {{.CONFDIR}}/
+      - "{{.HOME}}/"
+      - "{{.CONFDIR}}/"
     targets:
       - remote_machine:/etc/target1/
       - remote_machine:/etc/target2/
       - remote_machine:/etc/target3/
   - cmd: ["scp", "-rp"]
     sources:
-      - {{.CONFDIR}}/
+      - "{{.CONFDIR}}/"
     targets:
       - remote_machine:/etc/whatever/
 
@@ -42,6 +41,8 @@ commands:
     - ["scp", "{{.HOME}}/whatever/file", "remote:/etc/whatever/"]
   ls:
     - ["ls", "lah"]
+  status:
+    - ["ssh", "remote_machine", "df", "-h"]
 ```
 
 ## Help
@@ -60,7 +61,6 @@ Flags:
       --log-file="/dev/stdout"    log file
       --log-level="info"          log level, can be: [trace,debug,info,error]
       --log-no-colors             disable output colours, print plain text
-      --log-json                  enable json log, instead of text one
   -V, --version-flag              display version
 
 Commands:

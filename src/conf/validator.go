@@ -10,16 +10,16 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/triole/logseal"
+	"p2r/src/logger"
 )
 
 // Validator handles input validation and path checking.
 type Validator struct {
-	Lg logseal.Logseal
+	Lg *logger.Logger
 }
 
 // NewValidator creates a new Validator instance.
-func NewValidator(lg logseal.Logseal) *Validator {
+func NewValidator(lg *logger.Logger) *Validator {
 	return &Validator{Lg: lg}
 }
 
@@ -55,7 +55,7 @@ func (v *Validator) ValidatePath(pathStr string) (Path, error) {
 		// Basic validation for remote host
 		if err := v.validateHostname(path.Machine); err != nil {
 			path.IsHealthy = false
-			v.Lg.Warn("invalid hostname in remote path", logseal.F{"machine": path.Machine, "error": err})
+			v.Lg.Warn("invalid hostname in remote path", map[string]interface{}{"machine": path.Machine, "error": err})
 		}
 	}
 
@@ -114,7 +114,7 @@ func (v *Validator) pathExists(path string) (bool, error) {
 func (v *Validator) isDirectory(fn string) bool {
 	fi, err := os.Stat(fn)
 	if err != nil {
-		v.Lg.Debug("path stat failed", logseal.F{"path": fn, "error": err})
+		v.Lg.Debug("path stat failed", map[string]interface{}{"path": fn, "error": err})
 		return false
 	}
 	return fi.IsDir()

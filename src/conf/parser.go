@@ -7,18 +7,19 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/triole/logseal"
+	"p2r/src/logger"
+
 	yaml "gopkg.in/yaml.v3"
 )
 
 // Parser handles configuration file parsing and template expansion.
 type Parser struct {
 	ConfigFile string
-	Lg         logseal.Logseal
+	Lg         *logger.Logger
 }
 
 // NewParser creates a new Parser instance.
-func NewParser(configFile string, lg logseal.Logseal) *Parser {
+func NewParser(configFile string, lg *logger.Logger) *Parser {
 	return &Parser{
 		ConfigFile: pabs(configFile),
 		Lg:         lg,
@@ -46,7 +47,7 @@ func (p *Parser) Parse() (ConfigContent, error) {
 		return ConfigContent{}, err
 	}
 
-	p.Lg.Debug("config parsed", logseal.F{"content": config})
+	p.Lg.Debug("config parsed", map[string]interface{}{"content": config})
 	return config, nil
 }
 
@@ -86,7 +87,7 @@ func (p *Parser) getUserDataMap() map[string]string {
 	currentUser, err := user.Current()
 	if err != nil {
 		// Return defaults on error instead of panic
-		p.Lg.Error("failed to get current user", logseal.F{"error": err})
+		p.Lg.Error("failed to get current user", map[string]interface{}{"error": err})
 		return map[string]string{
 			"home":     "",
 			"uid":      "",

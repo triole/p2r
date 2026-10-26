@@ -3,7 +3,7 @@ package conf
 import (
 	"os"
 
-	"github.com/triole/logseal"
+	"p2r/src/logger"
 
 	_ "embed"
 )
@@ -12,17 +12,17 @@ import (
 var content string
 
 // InitExample creates an example configuration file.
-func InitExample(configFile string, logger logseal.Logseal) error {
+func InitExample(configFile string, logger *logger.Logger) error {
 	exists, _ := pathExists(configFile)
 	if !exists {
-		logger.Info("creating example config", logseal.F{"path": configFile})
+		logger.Info("creating example config", map[string]interface{}{"path": configFile})
 		err := os.WriteFile(configFile, []byte(content), 0600)
 		if err != nil {
-			logger.Error("failed to create example config", logseal.F{"error": err})
+			logger.Error("failed to create example config", map[string]interface{}{"error": err})
 			return err
 		}
 	} else {
-		logger.Info("config file already exists, skipping creation", logseal.F{"path": configFile})
+		logger.Info("config file already exists, skipping creation", map[string]interface{}{"path": configFile})
 	}
 
 	return nil
@@ -44,7 +44,7 @@ func pathExists(path string) (bool, error) {
 func (cfg *Config) ListAvailableCommands() {
 	configContent, err := cfg.Load()
 	if err != nil {
-		cfg.Lg.Error("failed to load config", logseal.F{"error": err})
+		cfg.Lg.Error("failed to load config", map[string]interface{}{"error": err})
 		return
 	}
 	cfg.Executor.ListCommands(configContent)

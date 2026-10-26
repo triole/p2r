@@ -25,7 +25,6 @@ var cli struct {
 	LogFile     string `help:"log file" default:"/dev/stdout"`
 	LogLevel    string `help:"log level, can be: [${enum}]" default:"info" enum:"trace,debug,info,error"`
 	LogNoColors bool   `help:"disable output colours, print plain text"`
-	LogJSON     bool   `help:"enable json log, instead of text one"`
 	VersionFlag bool   `help:"display version" short:"V"`
 
 	Pull struct {
