@@ -27,13 +27,13 @@ func NewExecutor(lg *logger.Logger, printOnly bool, action string) *Executor {
 }
 
 // ExecuteCommands runs a list of commands.
+// Returns immediately on the first command failure to fail fast.
 func (e *Executor) ExecuteCommands(commands []ExecCommand, dryRun bool, rsyncDryRun bool) error {
 	if len(commands) == 0 {
 		e.Lg.Error("no commands to execute", nil)
 		return fmt.Errorf("no commands provided")
 	}
 
-	var lastErr error
 	for i, cmd := range commands {
 		// Apply dry-run flag for rsync if enabled
 		cmdCopy := make([]string, len(cmd.Cmd))
@@ -63,11 +63,11 @@ func (e *Executor) ExecuteCommands(commands []ExecCommand, dryRun bool, rsyncDry
 				"action":    e.Action,
 				"dry_run":   dryRun,
 			})
-			lastErr = err
+			return fmt.Errorf("command %d failed: %w", i, err)
 		}
 	}
 
-	return lastErr
+	return nil
 }
 
 // runCommand executes a single command.
