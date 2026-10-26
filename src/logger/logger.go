@@ -23,7 +23,7 @@ const (
 	WarnLevel
 	ErrorLevel
 	FatalLevel
-	logStringFormat = "%s %s %-30s %s\n"
+	logStringFormat = "%-8s %s %-30s %s\n"
 )
 
 // Logger wraps Go's standard log package with level filtering
@@ -101,10 +101,10 @@ func (l *Logger) colorPrefix(level string) string {
 	}
 
 	colors := map[string]string{
-		"TRACE": "\033[36mTRACE\033[0m", // cyan
+		"TRACE": "\033[37mTRACE\033[0m", // grey
 		"DEBUG": "\033[36mDEBUG\033[0m", // cyan
-		"INFO":  "\033[32mINFO \033[0m", // green
-		"WARN":  "\033[33mWARN \033[0m", // yellow
+		"INFO":  "\033[32mINFO\033[0m",  // green
+		"WARN":  "\033[33mWARN\033[0m",  // yellow
 		"ERROR": "\033[31mERROR\033[0m", // red
 		"FATAL": "\033[31mFATAL\033[0m", // red
 	}

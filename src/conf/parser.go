@@ -29,12 +29,14 @@ func NewParser(configFile string, lg *logger.Logger) *Parser {
 // Parse reads and parses the YAML configuration file with template expansion.
 func (p *Parser) Parse() (ConfigContent, error) {
 	// Read config file
+	p.Lg.Trace("read config", map[string]interface{}{"path": p.ConfigFile})
 	content, err := os.ReadFile(p.ConfigFile)
 	if err != nil {
 		return ConfigContent{}, err
 	}
 
 	// Expand templates
+	p.Lg.Trace("expand template", map[string]interface{}{})
 	expanded, err := p.expandTemplate(string(content))
 	if err != nil {
 		return ConfigContent{}, err
@@ -42,6 +44,7 @@ func (p *Parser) Parse() (ConfigContent, error) {
 
 	// Unmarshal YAML
 	var config ConfigContent
+	p.Lg.Trace("unmarshal config", map[string]interface{}{})
 	err = yaml.Unmarshal(expanded, &config)
 	if err != nil {
 		return ConfigContent{}, err
