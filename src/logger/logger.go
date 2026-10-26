@@ -72,7 +72,7 @@ func NewLogger(levelStr string, logFile string, noColors bool) *Logger {
 
 // formatTime returns timestamp string
 func formatTime() string {
-	return time.Now().Format("2006-01-02 15:04:05.000 MST")
+	return time.Now().Format("[2006-01-02 15:04:05.000 MST]")
 }
 
 // formatFields converts key-value pairs to string
@@ -94,12 +94,12 @@ func (l *Logger) colorPrefix(level string) string {
 	}
 
 	colors := map[string]string{
-		"TRACE": "\033[36m[TRACE]\033[0m", // cyan
-		"DEBUG": "\033[36m[DEBUG]\033[0m", // cyan
-		"INFO":  "\033[32m[INFO ]\033[0m", // green
-		"WARN":  "\033[33m[WARN ]\033[0m", // yellow
-		"ERROR": "\033[31m[ERROR]\033[0m", // red
-		"FATAL": "\033[31m[FATAL]\033[0m", // red
+		"TRACE": "\033[36mTRACE\033[0m", // cyan
+		"DEBUG": "\033[36mDEBUG\033[0m", // cyan
+		"INFO":  "\033[32mINFO \033[0m", // green
+		"WARN":  "\033[33mWARN \033[0m", // yellow
+		"ERROR": "\033[31mERROR\033[0m", // red
+		"FATAL": "\033[31mFATAL\033[0m", // red
 	}
 
 	if c, ok := colors[level]; ok {
