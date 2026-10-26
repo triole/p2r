@@ -25,10 +25,6 @@ const (
 	FatalLevel
 )
 
-var (
-	logStringFormat = "%-14s %s %-32s %s\n"
-)
-
 // Logger wraps Go's standard log package with level filtering
 type Logger struct {
 	mu     sync.Mutex
@@ -37,6 +33,7 @@ type Logger struct {
 	file   *os.File // file handle for cleanup, nil if stdout/stderr
 	colors bool
 	closed bool // track if already closed
+	format string
 }
 
 // NewLogger creates a logger with the given level and output
@@ -71,12 +68,18 @@ func NewLogger(levelStr string, logFile string, noColors bool) *Logger {
 		file = f // store file handle for later cleanup
 	}
 
+	format := "%-14s %s %-32s %s\n"
+	if noColors {
+		format = "%-5s %s %-32s %s\n"
+	}
+
 	return &Logger{
 		level:  level,
 		out:    output,
 		file:   file,
 		colors: !noColors,
 		closed: false,
+		format: format,
 	}
 }
 
@@ -100,7 +103,6 @@ func formatFields(fields map[string]interface{}) string {
 // colorPrefix returns ANSI color codes if colors enabled
 func (l *Logger) colorPrefix(level string) string {
 	if !l.colors {
-		logStringFormat = "%-5s %s %-32s %s\n"
 		return level
 	}
 
@@ -125,7 +127,7 @@ func (l *Logger) Trace(msg string, fields map[string]interface{}) {
 		l.mu.Lock()
 		defer l.mu.Unlock()
 		fmt.Fprintf(
-			l.out, logStringFormat,
+			l.out, l.format,
 			l.colorPrefix("TRACE"), formatTime(), msg, formatFields(fields),
 		)
 	}
@@ -137,7 +139,7 @@ func (l *Logger) Debug(msg string, fields map[string]interface{}) {
 		l.mu.Lock()
 		defer l.mu.Unlock()
 		fmt.Fprintf(
-			l.out, logStringFormat,
+			l.out, l.format,
 			l.colorPrefix("DEBUG"), formatTime(), msg, formatFields(fields),
 		)
 	}
@@ -149,7 +151,7 @@ func (l *Logger) Info(msg string, fields map[string]interface{}) {
 		l.mu.Lock()
 		defer l.mu.Unlock()
 		fmt.Fprintf(
-			l.out, logStringFormat,
+			l.out, l.format,
 			l.colorPrefix("INFO"), formatTime(), msg, formatFields(fields),
 		)
 	}
@@ -161,7 +163,7 @@ func (l *Logger) Warn(msg string, fields map[string]interface{}) {
 		l.mu.Lock()
 		defer l.mu.Unlock()
 		fmt.Fprintf(
-			l.out, logStringFormat,
+			l.out, l.format,
 			l.colorPrefix("WARN"), formatTime(), msg, formatFields(fields),
 		)
 	}
@@ -173,7 +175,7 @@ func (l *Logger) Error(msg string, fields map[string]interface{}) {
 		l.mu.Lock()
 		defer l.mu.Unlock()
 		fmt.Fprintf(
-			l.out, logStringFormat,
+			l.out, l.format,
 			l.colorPrefix("ERROR"), formatTime(), msg, formatFields(fields),
 		)
 	}
@@ -203,7 +205,7 @@ func (l *Logger) Fatal(msg string, fields map[string]interface{}) {
 		l.mu.Lock()
 		defer l.mu.Unlock()
 		fmt.Fprintf(
-			l.out, logStringFormat,
+			l.out, l.format,
 			l.colorPrefix("FATAL"), formatTime(), msg, formatFields(fields),
 		)
 		// Flush output before exit
