@@ -23,6 +23,7 @@ const (
 	WarnLevel
 	ErrorLevel
 	FatalLevel
+	logStringFormat = "%s %s %-30s %s\n"
 )
 
 // Logger wraps Go's standard log package with level filtering
@@ -84,7 +85,7 @@ func formatFields(fields map[string]interface{}) string {
 	for k, v := range fields {
 		parts = append(parts, fmt.Sprintf("%s=%v", k, v))
 	}
-	return " " + strings.Join(parts, " ")
+	return strings.Join(parts, " ")
 }
 
 // colorPrefix returns ANSI color codes if colors enabled
@@ -113,7 +114,10 @@ func (l *Logger) Trace(msg string, fields map[string]interface{}) {
 	if l.level <= TraceLevel {
 		l.mu.Lock()
 		defer l.mu.Unlock()
-		fmt.Fprintf(l.out, "%s %s %s%s\n", l.colorPrefix("TRACE"), formatTime(), msg, formatFields(fields))
+		fmt.Fprintf(
+			l.out, logStringFormat,
+			l.colorPrefix("TRACE"), formatTime(), msg, formatFields(fields),
+		)
 	}
 }
 
@@ -122,7 +126,10 @@ func (l *Logger) Debug(msg string, fields map[string]interface{}) {
 	if l.level <= DebugLevel {
 		l.mu.Lock()
 		defer l.mu.Unlock()
-		fmt.Fprintf(l.out, "%s %s %s%s\n", l.colorPrefix("DEBUG"), formatTime(), msg, formatFields(fields))
+		fmt.Fprintf(
+			l.out, logStringFormat,
+			l.colorPrefix("DEBUG"), formatTime(), msg, formatFields(fields),
+		)
 	}
 }
 
@@ -131,7 +138,10 @@ func (l *Logger) Info(msg string, fields map[string]interface{}) {
 	if l.level <= InfoLevel {
 		l.mu.Lock()
 		defer l.mu.Unlock()
-		fmt.Fprintf(l.out, "%s %s %s%s\n", l.colorPrefix("INFO"), formatTime(), msg, formatFields(fields))
+		fmt.Fprintf(
+			l.out, logStringFormat,
+			l.colorPrefix("INFO"), formatTime(), msg, formatFields(fields),
+		)
 	}
 }
 
@@ -140,7 +150,10 @@ func (l *Logger) Warn(msg string, fields map[string]interface{}) {
 	if l.level <= WarnLevel {
 		l.mu.Lock()
 		defer l.mu.Unlock()
-		fmt.Fprintf(l.out, "%s %s %s%s\n", l.colorPrefix("WARN"), formatTime(), msg, formatFields(fields))
+		fmt.Fprintf(
+			l.out, logStringFormat,
+			l.colorPrefix("WARN"), formatTime(), msg, formatFields(fields),
+		)
 	}
 }
 
@@ -149,7 +162,10 @@ func (l *Logger) Error(msg string, fields map[string]interface{}) {
 	if l.level <= ErrorLevel {
 		l.mu.Lock()
 		defer l.mu.Unlock()
-		fmt.Fprintf(l.out, "%s %s %s%s\n", l.colorPrefix("ERROR"), formatTime(), msg, formatFields(fields))
+		fmt.Fprintf(
+			l.out, logStringFormat,
+			l.colorPrefix("ERROR"), formatTime(), msg, formatFields(fields),
+		)
 	}
 }
 
@@ -158,7 +174,10 @@ func (l *Logger) Fatal(msg string, fields map[string]interface{}) {
 	if l.level <= FatalLevel {
 		l.mu.Lock()
 		defer l.mu.Unlock()
-		fmt.Fprintf(l.out, "%s %s FATAL: %s%s\n", l.colorPrefix("FATAL"), formatTime(), msg, formatFields(fields))
+		fmt.Fprintf(
+			l.out, logStringFormat,
+			l.colorPrefix("FATAL"), formatTime(), msg, formatFields(fields),
+		)
 		os.Exit(1)
 	}
 }
