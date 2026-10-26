@@ -11,10 +11,7 @@ import (
 )
 
 var (
-	BUILDTAGS      string
-	appName        = "p2r"
-	appDescription = "push or pull remote file systems"
-	appMainversion = "0.1"
+	BUILDTAGS string
 )
 
 var cli struct {
@@ -47,8 +44,8 @@ var cli struct {
 func parseArgs() {
 	curdir := pwd()
 	ctx := kong.Parse(&cli,
-		kong.Name(appName),
-		kong.Description(appDescription),
+		kong.Name(AppName),
+		kong.Description(AppDescription),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact:      true,
@@ -57,13 +54,14 @@ func parseArgs() {
 			FlagsLast:    false,
 		}),
 		kong.Vars{
-			"configFile": filepath.Join(curdir, "p2r.yaml"),
+			"configFile": filepath.Join(curdir, DefaultConfig),
+			"enum":       LogLevelEnum,
 		},
 	)
 	_ = ctx.Run()
 	// ctx.FatalIfErrorf(err)
 	cli.Action = strings.Split(ctx.Command(), " ")[0]
-	if cli.Action == "version" {
+	if cli.Action == ActionVersion {
 		printBuildTags(BUILDTAGS)
 		os.Exit(0)
 	}
@@ -72,7 +70,7 @@ func parseArgs() {
 func printBuildTags(buildtags string) {
 	regexp, _ := regexp.Compile(`({|}|,)`)
 	s := regexp.ReplaceAllString(buildtags, "\n")
-	s = strings.Replace(s, "_subversion: ", "Version: "+appMainversion+".", -1)
+	s = strings.Replace(s, "_subversion: ", "Version: "+AppVersion+".", -1)
 	fmt.Printf("%s\n", s)
 }
 

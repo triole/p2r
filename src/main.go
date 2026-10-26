@@ -12,7 +12,6 @@ var (
 )
 
 func main() {
-	// Parse command line arguments
 	parseArgs()
 
 	// Initialize logger with zero dependencies
@@ -30,7 +29,7 @@ func main() {
 	)
 
 	// Log startup information
-	lg.Info("starting "+appName, map[string]interface{}{
+	lg.Info("starting "+AppName, map[string]interface{}{
 		"config":    cfg.ConfigFile,
 		"action":    cfg.Action,
 		"dry-run":   cli.PrintOnly,
@@ -44,11 +43,11 @@ func main() {
 	}
 
 	switch cfg.Action {
-	case "init":
+	case ActionInit:
 		conf.InitExample(cli.Config, lg)
 		return
 
-	case "version":
+	case ActionVersion:
 		printBuildTags(BUILDTAGS)
 		return
 
@@ -74,10 +73,10 @@ func executeAction(cfg *conf.Config) error {
 	var commands []conf.ExecCommand
 
 	switch cfg.Action {
-	case "pull", "push":
+	case ActionPull, ActionPush:
 		commands = buildSyncCommands(configContent, cfg.Action, cfg.RsyncDryRun)
 
-	case "cmd":
+	case ActionCmd:
 		if cfg.SubAction == "" {
 			return fmt.Errorf("no sub-action specified for cmd")
 		}
@@ -107,7 +106,7 @@ func buildSyncCommands(configContent conf.ConfigContent, action string, rsyncDry
 		targets := step.Targets
 
 		// Swap sources/targets for pull action
-		if action == "pull" {
+		if action == ActionPull {
 			sources, targets = targets, sources
 		}
 
