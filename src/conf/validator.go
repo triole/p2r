@@ -79,13 +79,17 @@ type Path struct {
 	IsFolder  bool
 	IsEmpty   bool
 	IsHealthy bool
+	Errors    []error
 }
 
 // validatePathList validates a list of paths.
 func (v *Validator) validatePathList(paths []string) []Path {
 	validated := make([]Path, 0, len(paths))
 	for _, p := range paths {
-		validatedPath, _ := v.ValidatePath(p)
+		validatedPath, err := v.ValidatePath(p)
+		if err != nil {
+			validatedPath.Errors = append(validatedPath.Errors, err)
+		}
 		validated = append(validated, validatedPath)
 	}
 	return validated
@@ -183,18 +187,32 @@ func (v *Validator) ValidateSyncStep(step SyncStep) (validated Step, errArr []er
 		errArr = append(errArr, errors.New("command array is empty"))
 	}
 
-	// Validate sources
-	for _, src := range step.Sources {
+	// Validate sources using validatePathList
+	validatedSourcePaths := v.validatePathList(step.Sources)
+	for i, src := range step.Sources {
 		if err := v.checkDangerousPatterns(src); err != nil {
-			errArr = append(errArr, fmt.Errorf("source path invalid: %w", err))
+			errArr = append(errArr, fmt.Errorf("source path[%d] invalid: %w", i, err))
+		}
+		// Check for validation errors from validatePathList
+		if len(validatedSourcePaths[i].Errors) > 0 {
+			for _, err := range validatedSourcePaths[i].Errors {
+				errArr = append(errArr, fmt.Errorf("source path[%d] validation error: %w", i, err))
+			}
 		}
 		validated.SourcePaths = append(validated.SourcePaths, src)
 	}
 
-	// Validate targets
-	for _, tgt := range step.Targets {
+	// Validate targets using validatePathList
+	validatedTargetPaths := v.validatePathList(step.Targets)
+	for i, tgt := range step.Targets {
 		if err := v.checkDangerousPatterns(tgt); err != nil {
-			errArr = append(errArr, fmt.Errorf("target path invalid: %w", err))
+			errArr = append(errArr, fmt.Errorf("target path[%d] invalid: %w", i, err))
+		}
+		// Check for validation errors from validatePathList
+		if len(validatedTargetPaths[i].Errors) > 0 {
+			for _, err := range validatedTargetPaths[i].Errors {
+				errArr = append(errArr, fmt.Errorf("target path[%d] validation error: %w", i, err))
+			}
 		}
 		validated.TargetPaths = append(validated.TargetPaths, tgt)
 	}
