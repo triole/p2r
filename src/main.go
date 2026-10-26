@@ -17,6 +17,7 @@ func main() {
 
 	// Initialize logger with zero dependencies
 	lg = logger.NewLogger(cli.LogLevel, cli.LogFile, cli.LogNoColors)
+	defer lg.Close() // Ensure file handle is closed on exit
 
 	// Build configuration
 	cfg := conf.NewConfig(

@@ -31,7 +31,9 @@ type Logger struct {
 	mu     sync.Mutex
 	level  Level
 	out    io.Writer
+	file   *os.File // file handle for cleanup, nil if stdout/stderr
 	colors bool
+	closed bool // track if already closed
 }
 
 // NewLogger creates a logger with the given level and output
@@ -55,6 +57,7 @@ func NewLogger(levelStr string, logFile string, noColors bool) *Logger {
 
 	// Set output destination
 	output := os.Stdout
+	file := (*os.File)(nil)
 	if logFile != "" && logFile != "stdout" && logFile != "/dev/stdout" {
 		f, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
@@ -62,12 +65,15 @@ func NewLogger(levelStr string, logFile string, noColors bool) *Logger {
 			os.Exit(1)
 		}
 		output = f
+		file = f // store file handle for later cleanup
 	}
 
 	return &Logger{
 		level:  level,
 		out:    output,
+		file:   file,
 		colors: !noColors,
+		closed: false,
 	}
 }
 
@@ -169,7 +175,25 @@ func (l *Logger) Error(msg string, fields map[string]interface{}) {
 	}
 }
 
-// Fatal logs a message at fatal level and exits
+// Close closes the file handle if a log file was opened.
+// This should be called before program exit to ensure proper cleanup.
+func (l *Logger) Close() error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	if l.closed {
+		return nil // already closed
+	}
+	l.closed = true
+
+	if l.file != nil {
+		l.file.Sync() // flush to disk
+		return l.file.Close()
+	}
+	return nil
+}
+
+// Fatal logs a message at fatal level, flushes, and exits.
 func (l *Logger) Fatal(msg string, fields map[string]interface{}) {
 	if l.level <= FatalLevel {
 		l.mu.Lock()
@@ -178,6 +202,14 @@ func (l *Logger) Fatal(msg string, fields map[string]interface{}) {
 			l.out, logStringFormat,
 			l.colorPrefix("FATAL"), formatTime(), msg, formatFields(fields),
 		)
+		// Flush output before exit
+		if f, ok := l.out.(interface{ Sync() error }); ok {
+			f.Sync()
+		}
+		// Close file handle if present
+		if l.file != nil {
+			l.file.Close()
+		}
 		os.Exit(1)
 	}
 }
