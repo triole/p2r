@@ -1,9 +1,7 @@
 package conf
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -73,6 +71,7 @@ func (e *Executor) ExecuteCommands(commands []ExecCommand, dryRun bool, rsyncDry
 }
 
 // runCommand executes a single command.
+// Output streams directly to stdout; no buffering to avoid memory issues with large outputs.
 func (e *Executor) runCommand(cmdArr []string) ([]byte, int, error) {
 	if len(cmdArr) == 0 {
 		return nil, 0, fmt.Errorf("empty command array")
@@ -91,15 +90,10 @@ func (e *Executor) runCommand(cmdArr []string) ([]byte, int, error) {
 	}
 
 	cmd := exec.Command(cmdArr[0], cmdArr[1:]...)
-
-	var outputBuffer bytes.Buffer
-	multiWriter := io.MultiWriter(os.Stdout, &outputBuffer)
-	cmd.Stdout = multiWriter
-	cmd.Stderr = multiWriter
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	err := cmd.Run()
-	output := outputBuffer.Bytes()
-
 	var exitCode int
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
@@ -107,13 +101,13 @@ func (e *Executor) runCommand(cmdArr []string) ([]byte, int, error) {
 				exitCode = status.ExitStatus()
 			}
 		}
-		e.Lg.Debug("command output", logseal.F{
+		e.Lg.Debug("command failed", logseal.F{
 			"action": e.Action,
 			"cmd":    fmt.Sprintf("%+v", cmdArr),
-			"output": string(output),
 			"error":  err,
+			"exit":   exitCode,
 		})
-		return output, exitCode, err
+		return nil, exitCode, err
 	}
 
 	e.Lg.Debug("command completed successfully", logseal.F{
@@ -122,7 +116,7 @@ func (e *Executor) runCommand(cmdArr []string) ([]byte, int, error) {
 		"exit":   exitCode,
 	})
 
-	return output, exitCode, nil
+	return nil, exitCode, nil
 }
 
 // ListCommands displays all available commands from config.
