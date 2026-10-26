@@ -23,6 +23,9 @@ const (
 	WarnLevel
 	ErrorLevel
 	FatalLevel
+)
+
+var (
 	logStringFormat = "%-14s %s %-32s %s\n"
 )
 
@@ -97,7 +100,8 @@ func formatFields(fields map[string]interface{}) string {
 // colorPrefix returns ANSI color codes if colors enabled
 func (l *Logger) colorPrefix(level string) string {
 	if !l.colors {
-		return "[" + level + "]"
+		logStringFormat = "%-5s %s %-32s %s\n"
+		return level
 	}
 
 	colors := map[string]string{
