@@ -23,7 +23,7 @@ const (
 	WarnLevel
 	ErrorLevel
 	FatalLevel
-	logStringFormat = "%-8s %s %-30s %s\n"
+	logStringFormat = "%-14s %s %-32s %s\n"
 )
 
 // Logger wraps Go's standard log package with level filtering
