@@ -1,46 +1,58 @@
 package conf
 
 import (
-	"bytes"
-	"os/user"
-	"path/filepath"
-	"text/template"
+	"github.com/triole/logseal"
 )
 
-func (conf Conf) templateFile(str string) (by []byte, err error) {
-	ud := conf.getUserdataMap()
-	buf := &bytes.Buffer{}
-	templ, err := template.New("conf").Parse(str)
-	if err == nil {
-		templ.Execute(buf, map[string]interface{}{
-			"confdir": filepath.Dir(conf.pabs(conf.ConfigFile)),
-			"CONFDIR": filepath.Dir(conf.pabs(conf.ConfigFile)),
-			"workdir": pwd(),
-			"WORKDIR": pwd(),
-			"home":    ud["home"],
-			"HOME":    ud["home"],
-			"uid":     ud["uid"],
-			"UID":     ud["uid"],
-			"gid":     ud["gid"],
-			"GID":     ud["gid"],
-			"user":    ud["username"],
-			"USER":    ud["username"],
-		})
-		by = buf.Bytes()
-	}
-	return
+// Config represents the main configuration wrapper.
+type Config struct {
+	ConfigFile  string
+	Action      string
+	SubAction   string
+	DryRun      bool
+	RsyncDryRun bool
+	Lg          logseal.Logseal
+	Parser      *Parser
+	Validator   *Validator
+	Executor    *Executor
 }
 
-func (conf Conf) getUserdataMap() map[string]string {
-	user, err := user.Current()
-	if err != nil {
-		panic(err)
+// NewConfig creates a new configuration instance.
+func NewConfig(
+	configFile string,
+	action string,
+	subAction string,
+	dryRun bool,
+	rsyncDryRun bool,
+	logger logseal.Logseal,
+) *Config {
+
+	parser := NewParser(configFile, logger)
+	validator := NewValidator(logger)
+	executor := NewExecutor(logger, false, action) // PrintOnly set later
+
+	return &Config{
+		Parser:      parser,
+		Validator:   validator,
+		Executor:    executor,
+		ConfigFile:  configFile,
+		Action:      action,
+		SubAction:   subAction,
+		DryRun:      dryRun,
+		RsyncDryRun: rsyncDryRun,
+		Lg:          logger,
 	}
-	m := make(map[string]string)
-	m["home"] = user.HomeDir
-	m["uid"] = user.Uid
-	m["gid"] = user.Gid
-	m["username"] = user.Username
-	m["name"] = user.Name
-	return m
+}
+
+// SetPrintOnly updates executor's print-only mode.
+func (c *Config) SetPrintOnly(printOnly bool) {
+	c.Executor.PrintOnly = printOnly
+	c.Parser.Lg = c.Lg
+	c.Validator.Lg = c.Lg
+	c.Executor.Lg = c.Lg
+}
+
+// Load reads and parses the configuration file.
+func (c *Config) Load() (ConfigContent, error) {
+	return c.Parser.Parse()
 }

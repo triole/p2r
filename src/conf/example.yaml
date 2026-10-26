@@ -10,20 +10,19 @@ sync_steps:
       - --exclude=/vol/
       - --exclude=/conf.toml
     sources:
-      - {{.HOME}}/
-      - {{.CONFDIR}}/
+      - "{{.HOME}}/"
+      - "{{.CONFDIR}}/"
     targets:
       - remote_machine:/etc/target1/
       - remote_machine:/etc/target2/
-      - remote_machine:/etc/target3/
   - cmd: ["scp", "-rp"]
     sources:
-      - {{.CONFDIR}}/
+      - "{{.CONFDIR}}/"
     targets:
       - remote_machine:/etc/whatever/
 
 commands:
   update:
     - ["scp", "{{.HOME}}/whatever/file", "remote:/etc/whatever/"]
-  ls:
-    - ["ls", "lah"]
+  status:
+    - ["ssh", "remote_machine", "df", "-h"]

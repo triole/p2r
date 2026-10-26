@@ -4,82 +4,48 @@ import (
 	"os"
 
 	"github.com/triole/logseal"
-	yaml "gopkg.in/yaml.v3"
+
+	_ "embed"
 )
 
-func Init(filename, action, subaction string, dryRun, rsyncDryRun bool, lg logseal.Logseal) (conf Conf) {
-	conf.ConfigFile = conf.pabs(filename)
-	conf.Action = action
-	conf.SubAction = subaction
-	conf.DryRun = dryRun
-	conf.RsyncDryRun = rsyncDryRun
-	conf.Lg = lg
-	var configContent ConfigContent
-	if conf.Action == "init" {
-		conf.InitExample()
-		os.Exit(0)
+//go:embed example.yaml
+var content string
+
+// InitExample creates an example configuration file.
+func InitExample(configFile string, logger logseal.Logseal) error {
+	exists, _ := pathExists(configFile)
+	if !exists {
+		logger.Info("creating example config", logseal.F{"path": configFile})
+		err := os.WriteFile(configFile, []byte(content), 0600)
+		if err != nil {
+			logger.Error("failed to create example config", logseal.F{"error": err})
+			return err
+		}
 	} else {
-		configContent = conf.expand()
+		logger.Info("config file already exists, skipping creation", logseal.F{"path": configFile})
 	}
-	conf.assembleCommands(configContent)
-	return conf
+
+	return nil
 }
 
-func (conf *Conf) expand() (configContent ConfigContent) {
-	by, err := os.ReadFile(conf.ConfigFile)
-	conf.Lg.IfErrFatal(
-		"can not read file", logseal.F{"path": conf.ConfigFile, "error": err},
-	)
-	by, _ = conf.templateFile(string(by))
-	err = yaml.Unmarshal(by, &configContent)
-	conf.Lg.IfErrFatal(
-		"can not unmarshal config", logseal.F{"path": conf.ConfigFile, "error": err},
-	)
-	conf.Lg.Debug("config content", logseal.F{"content": configContent})
-	return
+// pathExists checks if a file exists.
+func pathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
 
-func (conf *Conf) assembleCommands(configContent ConfigContent) {
-	switch conf.Action {
-	case "pull", "push":
-		for _, step := range configContent.SyncSteps {
-			conf.Commands = append(conf.Commands, conf.assembleSyncCommands(step)...)
-		}
-	case "cmd":
-		if commands, ok := configContent.Commands[conf.SubAction]; ok {
-			for _, command := range commands {
-				var cmd Command
-				cmd.Cmd = command
-				conf.Commands = append(conf.Commands, cmd)
-			}
-		}
+// ListAvailableCommands displays all available commands from config.
+func (cfg *Config) ListAvailableCommands() {
+	configContent, err := cfg.Load()
+	if err != nil {
+		cfg.Lg.Error("failed to load config", logseal.F{"error": err})
+		return
 	}
-	conf.Lg.Debug("commands set", logseal.F{"commands": conf.Commands})
-}
-
-func (conf *Conf) assembleSyncCommands(step SyncStep) (cmds []Command) {
-	sources := conf.parsePathList(step.Sources)
-	targets := conf.parsePathList(step.Targets)
-
-	if conf.Action == "pull" {
-		temp := sources
-		sources = targets
-		targets = temp
-	}
-
-	if step.Cmd[0] == "rsync" && conf.RsyncDryRun {
-		step.Cmd = append(step.Cmd, "--dry-run")
-	}
-	for _, source := range sources {
-		for _, target := range targets {
-			cmd := Command{}
-			cmd.Cmd = append(cmd.Cmd, step.Cmd...)
-			cmd.Cmd = append(cmd.Cmd, source.FullPath)
-			cmd.Cmd = append(cmd.Cmd, target.FullPath)
-			cmd.Err = append(cmd.Err, source.Errors...)
-			cmd.Err = append(cmd.Err, target.Errors...)
-			cmds = append(cmds, cmd)
-		}
-	}
-	return
+	cfg.Executor.ListCommands(configContent)
 }
